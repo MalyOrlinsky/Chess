@@ -51,58 +51,63 @@ void runTest(const std::string& testName, const std::string& input, const std::s
 int main() {
     // לבן זז למעלה צעד אחד
     runTest("white pawn moves up one",
-        "Board:\n. . .\nwP . .\n. . .\nCommands:\nclick 50 150\nclick 50 50\nprint board\n",
-        "wP . .\n. . .\n. . .\n");
+        "Board:\n. . .\n. wP .\n. . .\nCommands:\nclick 150 150\nclick 150 50\nprint board\n",
+        ". wP .\n. . .\n. . .\n");
 
     // שחור זז למטה צעד אחד
     runTest("black pawn moves down one",
-        "Board:\n. . .\nbP . .\n. . .\nCommands:\nclick 50 150\nclick 50 250\nprint board\n",
-        ". . .\n. . .\nbP . .\n");
+        "Board:\n. . .\n. bP .\n. . .\nCommands:\nclick 150 150\nclick 150 250\nprint board\n",
+        ". . .\n. . .\n. bP .\n");
 
-    // לבן זז שתיים מהשורה ההתחלתית (שורה 1 בלוח 3 שורות = grid.size()-2)
-    runTest("white pawn moves two from start",
-        "Board:\n. . .\nwP . .\n. . .\nCommands:\nclick 50 150\nclick 50 -50\nprint board\n",
-        ". . .\nwP . .\n. . .\n");
+    // לבן לא יכול לזוז שתיים
+    runTest("white pawn cannot move two",
+        "Board:\n. . .\n. . .\n. wP .\n. . .\nCommands:\nclick 150 250\nclick 150 50\nprint board\n",
+        ". . .\n. . .\n. wP .\n. . .\n");
 
-    // לבן זז שתיים בלוח 4 שורות (startRow = 2)
-    runTest("white pawn moves two from start row 4x3",
-        "Board:\n. . .\n. . .\nwP . .\n. . .\nCommands:\nclick 50 250\nclick 50 50\nprint board\n",
-        ". . .\nwP . .\n. . .\n. . .\n");
+    // שחור לא יכול לזוז שתיים
+    runTest("black pawn cannot move two",
+        "Board:\n. . .\n. bP .\n. . .\n. . .\nCommands:\nclick 150 150\nclick 150 350\nprint board\n",
+        ". . .\n. bP .\n. . .\n. . .\n");
 
-    // לבן לא יכול לזוז שתיים שלא מהשורה ההתחלתית
-    runTest("white pawn cannot move two from non-start",
-        "Board:\n. . .\nwP . .\n. . .\n. . .\nCommands:\nclick 50 150\nclick 50 -50\nprint board\n",
-        ". . .\nwP . .\n. . .\n. . .\n");
+    // לבן אוכל באלכסון שמאל
+    runTest("white pawn captures diagonally left",
+        "Board:\nbR . .\n. wP .\n. . .\nCommands:\nclick 150 150\nclick 50 50\nprint board\n",
+        "wP . .\n. . .\n. . .\n");
 
-    // לבן אוכל באלכסון
-    runTest("white pawn captures diagonally",
-        "Board:\n. bP .\nwP . .\n. . .\nCommands:\nclick 50 150\nclick 150 50\nprint board\n",
-        ". wP .\n. . .\n. . .\n");
+    // לבן אוכל באלכסון ימין
+    runTest("white pawn captures diagonally right",
+        "Board:\n. . bR\n. wP .\n. . .\nCommands:\nclick 150 150\nclick 250 50\nprint board\n",
+        ". . wP\n. . .\n. . .\n");
 
     // שחור אוכל באלכסון
     runTest("black pawn captures diagonally",
-        "Board:\n. . .\nbP . .\n. wP .\nCommands:\nclick 50 150\nclick 150 250\nprint board\n",
-        ". . .\n. . .\n. bP .\n");
+        "Board:\n. . .\n. bP .\n. wR .\nCommands:\nclick 150 150\nclick 250 250\nprint board\n",
+        ". . .\n. . .\n. . bP\n");
 
     // לבן לא יכול לאכול קדימה
     runTest("white pawn cannot capture forward",
-        "Board:\nbP . .\nwP . .\n. . .\nCommands:\nclick 50 150\nclick 50 50\nprint board\n",
-        "bP . .\nwP . .\n. . .\n");
+        "Board:\n. bR .\n. wP .\n. . .\nCommands:\nclick 150 150\nclick 150 50\nprint board\n",
+        ". bR .\n. wP .\n. . .\n");
 
     // שחור לא יכול לאכול קדימה
     runTest("black pawn cannot capture forward",
-        "Board:\n. . .\nbP . .\nwP . .\nCommands:\nclick 50 150\nclick 50 250\nprint board\n",
-        ". . .\nbP . .\nwP . .\n");
+        "Board:\n. . .\n. bP .\n. wR .\nCommands:\nclick 150 150\nclick 150 250\nprint board\n",
+        ". . .\n. bP .\n. wR .\n");
 
     // לבן לא יכול לזוז למטה
     runTest("white pawn cannot move down",
-        "Board:\n. . .\nwP . .\n. . .\nCommands:\nclick 50 150\nclick 50 250\nprint board\n",
-        ". . .\nwP . .\n. . .\n");
+        "Board:\n. . .\n. wP .\n. . .\nCommands:\nclick 150 150\nclick 150 250\nprint board\n",
+        ". . .\n. wP .\n. . .\n");
 
     // שחור לא יכול לזוז למעלה
     runTest("black pawn cannot move up",
-        "Board:\n. . .\nbP . .\n. . .\nCommands:\nclick 50 150\nclick 50 50\nprint board\n",
-        ". . .\nbP . .\n. . .\n");
+        "Board:\n. . .\n. bP .\n. . .\nCommands:\nclick 150 150\nclick 150 50\nprint board\n",
+        ". . .\n. bP .\n. . .\n");
+
+    // לבן לא יכול לאכול ידידותי באלכסון
+    runTest("white pawn cannot capture friendly diagonally",
+        "Board:\nwR . .\n. wP .\n. . .\nCommands:\nclick 150 150\nclick 50 50\nprint board\n",
+        "wR . .\n. wP .\n. . .\n");
 
     std::cout << "\n" << passed << " passed, " << failed << " failed\n";
     return 0;
