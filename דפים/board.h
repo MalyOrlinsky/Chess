@@ -26,6 +26,7 @@ struct PendingMove {
     int toRow, toCol;
     int arrivalTime;
     int startTime;
+    int moveOrder;
 };
 
 struct GameState {
@@ -36,6 +37,7 @@ struct GameState {
     std::vector<PendingMove> pending;
     bool gameOver = false;
     std::string winner;
+    int moveCounter = 0;
 };
 
 bool parseBoard(const std::vector<std::string>& lines, Board& board, std::string& error);

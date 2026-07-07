@@ -9,6 +9,8 @@ static int moveDistance(int fromRow, int fromCol, int toRow, int toCol) {
 }
 
 static void applyPendingMoves(GameState& state) {
+    if (state.gameOver) return;
+
     std::vector<PendingMove> ready;
     std::vector<PendingMove> remaining;
 
@@ -31,7 +33,8 @@ static void applyPendingMoves(GameState& state) {
             Piece* pb = state.board.grid[b.fromRow][b.fromCol];
             if (pa == nullptr || pb == nullptr) continue;
             if (pa->color == pb->color) continue;
-            if (a.startTime >= b.startTime) {
+            bool aFirst = (a.startTime < b.startTime) || (a.startTime == b.startTime && a.moveOrder < b.moveOrder);
+            if (!aFirst) {
                 delete state.board.grid[b.fromRow][b.fromCol];
                 state.board.grid[b.fromRow][b.fromCol] = nullptr;
                 cancelled[j] = true;
@@ -67,12 +70,13 @@ static void applyPendingMoves(GameState& state) {
         Piece* target = state.board.grid[pm.toRow][pm.toCol];
         if (target != nullptr && target->color == moving->color) continue;
 
+        bool capturedKing = (target != nullptr && target->type == 'K');
         delete target;
         state.board.grid[pm.toRow][pm.toCol] = moving;
         state.board.grid[pm.fromRow][pm.fromCol] = nullptr;
         taken.push_back({pm.toRow, pm.toCol});
 
-        if (target != nullptr && target->type == 'K') {
+        if (capturedKing) {
             state.gameOver = true;
             state.winner = (moving->color == Color::White) ? "white" : "black";
             state.pending.clear();
@@ -125,7 +129,7 @@ static void handleClick(int x, int y, GameState& state) {
 
     int dist = moveDistance(state.selectedRow, state.selectedCol, row, col);
     state.pending.push_back({state.selectedRow, state.selectedCol, row, col,
-                              state.clock + dist * 1000, state.clock});
+                              state.clock + dist * 1000, state.clock, state.moveCounter++});
     state.selectedRow = -1;
     state.selectedCol = -1;
 }
@@ -144,8 +148,6 @@ void runCommands(const std::vector<std::string>& commands, GameState& state) {
         } else if (state.gameOver) {
             continue;
         } else if (cmd.substr(0, 5) == "click") {
-            applyPendingMoves(state);
-            if (state.gameOver) continue;
             int x, y;
             std::istringstream ss(cmd.substr(6));
             ss >> x >> y;
