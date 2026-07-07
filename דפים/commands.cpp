@@ -9,30 +9,34 @@ static void handleClick(int x, int y, GameState& state) {
     if (row < 0 || row >= state.board.rows || col < 0 || col >= state.board.cols)
         return;
 
-    std::string& cell = state.board.grid[row][col];
+    Piece* cell = state.board.grid[row][col];
     bool hasSelection = state.selectedRow != -1;
 
     if (!hasSelection) {
-        if (cell != ".") {
+        if (cell != nullptr) {
             state.selectedRow = row;
             state.selectedCol = col;
         }
         return;
     }
 
-    // יש בחירה
-    std::string& selected = state.board.grid[state.selectedRow][state.selectedCol];
-    bool sameColor = (cell != "." && cell[0] == selected[0]);
+    Piece* selected = state.board.grid[state.selectedRow][state.selectedCol];
+    bool sameColor = (cell != nullptr && cell->color == selected->color);
 
     if (sameColor) {
         state.selectedRow = row;
         state.selectedCol = col;
-    } else {
-        cell = selected;
-        selected = ".";
-        state.selectedRow = -1;
-        state.selectedCol = -1;
+        return;
     }
+
+    if (!selected->isValidMove(state.selectedRow, state.selectedCol, row, col, state.board.grid))
+        return;
+
+    delete state.board.grid[row][col];
+    state.board.grid[row][col] = selected;
+    state.board.grid[state.selectedRow][state.selectedCol] = nullptr;
+    state.selectedRow = -1;
+    state.selectedCol = -1;
 }
 
 void runCommands(const std::vector<std::string>& commands, GameState& state) {
@@ -41,7 +45,7 @@ void runCommands(const std::vector<std::string>& commands, GameState& state) {
             for (const auto& row : state.board.grid) {
                 for (int i = 0; i < (int)row.size(); i++) {
                     if (i > 0) std::cout << " ";
-                    std::cout << row[i];
+                    std::cout << (row[i] ? row[i]->toString() : ".");
                 }
                 std::cout << "\n";
             }

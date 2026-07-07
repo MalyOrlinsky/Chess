@@ -1,11 +1,24 @@
 #pragma once
+#include "piece.h"
+#include "pieces/King.h"
+#include "pieces/Rook.h"
+#include "pieces/Bishop.h"
+#include "pieces/Queen.h"
+#include "pieces/Knight.h"
+#include "pieces/Pawn.h"
 #include <string>
 #include <vector>
 
 struct Board {
-    std::vector<std::vector<std::string>> grid;
+    std::vector<std::vector<Piece*>> grid;
     int rows;
     int cols;
+
+    ~Board() {
+        for (auto& row : grid)
+            for (auto* p : row)
+                delete p;
+    }
 };
 
 struct GameState {
