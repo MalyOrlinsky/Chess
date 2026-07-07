@@ -76,17 +76,6 @@ static void applyPendingMoves(GameState& state) {
         state.board.grid[pm.fromRow][pm.fromCol] = nullptr;
         taken.push_back({pm.toRow, pm.toCol});
 
-        // הפיכה לווזיר
-        if (moving->type == 'P') {
-            int lastRow = (moving->color == Color::White) ? 0 : state.board.rows - 1;
-            if (pm.toRow == lastRow) {
-                state.board.grid[pm.toRow][pm.toCol] = new Queen(moving->color);
-                delete moving;
-            } else {
-                static_cast<Pawn*>(moving)->hasMoved = true;
-            }
-        }
-
         if (capturedKing) {
             state.gameOver = true;
             state.winner = (moving->color == Color::White) ? "white" : "black";
@@ -94,6 +83,14 @@ static void applyPendingMoves(GameState& state) {
             state.selectedRow = -1;
             state.selectedCol = -1;
             return;
+        }
+
+        // הפיכה לווזיר
+        int lastRow = (moving->color == Color::White) ? 0 : state.board.rows - 1;
+        if (moving->type == 'P' && pm.toRow == lastRow) {
+            Color c = moving->color;
+            delete state.board.grid[pm.toRow][pm.toCol];
+            state.board.grid[pm.toRow][pm.toCol] = new Queen(c);
         }
     }
 
