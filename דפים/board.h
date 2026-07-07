@@ -21,11 +21,19 @@ struct Board {
     }
 };
 
+struct PendingMove {
+    int fromRow, fromCol;
+    int toRow, toCol;
+    int arrivalTime;
+    bool active = false;
+};
+
 struct GameState {
     Board board;
     int selectedRow = -1;
     int selectedCol = -1;
     int clock = 0;
+    PendingMove pending;
 };
 
 bool parseBoard(const std::vector<std::string>& lines, Board& board, std::string& error);

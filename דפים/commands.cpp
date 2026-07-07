@@ -1,6 +1,24 @@
 #include "commands.h"
 #include <iostream>
 #include <sstream>
+#include <cmath>
+
+static int moveDistance(int fromRow, int fromCol, int toRow, int toCol) {
+    return std::max(abs(toRow - fromRow), abs(toCol - fromCol));
+}
+
+static void applyPendingMove(GameState& state) {
+    if (!state.pending.active) return;
+    if (state.clock < state.pending.arrivalTime) return;
+
+    int fr = state.pending.fromRow, fc = state.pending.fromCol;
+    int tr = state.pending.toRow,   tc = state.pending.toCol;
+
+    delete state.board.grid[tr][tc];
+    state.board.grid[tr][tc] = state.board.grid[fr][fc];
+    state.board.grid[fr][fc] = nullptr;
+    state.pending.active = false;
+}
 
 static void handleClick(int x, int y, GameState& state) {
     int col = x / 100;
@@ -14,6 +32,10 @@ static void handleClick(int x, int y, GameState& state) {
 
     if (!hasSelection) {
         if (cell != nullptr) {
+            // אם הכלי כבר בתנועה - מתעלמים
+            if (state.pending.active &&
+                state.pending.fromRow == row && state.pending.fromCol == col)
+                return;
             state.selectedRow = row;
             state.selectedCol = col;
         }
@@ -32,9 +54,9 @@ static void handleClick(int x, int y, GameState& state) {
     if (!selected->isValidMove(state.selectedRow, state.selectedCol, row, col, state.board.grid))
         return;
 
-    delete state.board.grid[row][col];
-    state.board.grid[row][col] = selected;
-    state.board.grid[state.selectedRow][state.selectedCol] = nullptr;
+    int dist = moveDistance(state.selectedRow, state.selectedCol, row, col);
+    state.pending = {state.selectedRow, state.selectedCol, row, col,
+                     state.clock + dist * 1000, true};
     state.selectedRow = -1;
     state.selectedCol = -1;
 }
@@ -42,6 +64,7 @@ static void handleClick(int x, int y, GameState& state) {
 void runCommands(const std::vector<std::string>& commands, GameState& state) {
     for (const std::string& cmd : commands) {
         if (cmd == "print board") {
+            applyPendingMove(state);
             for (const auto& row : state.board.grid) {
                 for (int i = 0; i < (int)row.size(); i++) {
                     if (i > 0) std::cout << " ";
