@@ -9,10 +9,10 @@ static int moveDistance(int fromRow, int fromCol, int toRow, int toCol) {
 }
 
 static void applyPendingMoves(GameState& state) {
-    // מיין לפי זמן התחלה - מי שהתחיל ראשון מנצח בהתנגשות
+    // מיין לפי זמן התחלה - מי שהתחיל אחרון מנצח בהתנגשות
     std::sort(state.pending.begin(), state.pending.end(),
         [](const PendingMove& a, const PendingMove& b) {
-            return a.startTime < b.startTime;
+            return a.startTime > b.startTime;
         });
 
     std::vector<PendingMove> remaining;

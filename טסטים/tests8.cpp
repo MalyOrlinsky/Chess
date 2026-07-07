@@ -64,15 +64,15 @@ int main() {
         "Board:\nwR wK .\nCommands:\nclick 50 50\nclick 150 50\nwait 1000\nprint board\n",
         "wR wK .\n");
 
-    // שני כלים לאותו תא - מי שהתחיל ראשון מנצח
-    runTest("two pieces same destination first wins",
+    // שני כלים לאותו תא - מי שהתחיל אחרון מנצח
+    runTest("two pieces same destination last wins",
         "Board:\nwR . wB\nCommands:\nclick 50 50\nclick 150 50\nclick 250 50\nclick 150 50\nwait 1000\nprint board\n",
-        ". wR .\n");
-
-    // שני כלים לאותו תא - השני מנצח
-    runTest("two pieces same destination second wins",
-        "Board:\nwR . wB\nCommands:\nclick 250 50\nclick 150 50\nclick 50 50\nclick 150 50\nwait 1000\nprint board\n",
         ". wB .\n");
+
+    // שני כלים לאותו תא - הראשון מנצח כשהשני התחיל אחרון
+    runTest("two pieces same destination second started last wins",
+        "Board:\nwR . wB\nCommands:\nclick 250 50\nclick 150 50\nclick 50 50\nclick 150 50\nwait 1000\nprint board\n",
+        ". wR .\n");
 
     // כלי בתנועה לא ניתן לבחור
     runTest("moving piece cannot be selected",
