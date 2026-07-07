@@ -9,10 +9,10 @@ static int moveDistance(int fromRow, int fromCol, int toRow, int toCol) {
 }
 
 static void applyPendingMoves(GameState& state) {
-    // מיין לפי זמן הגעה - מי שהגיע ראשון מנצח
+    // מיין לפי זמן התחלה - מי שהתחיל ראשון מנצח בהתנגשות
     std::sort(state.pending.begin(), state.pending.end(),
         [](const PendingMove& a, const PendingMove& b) {
-            return a.arrivalTime < b.arrivalTime;
+            return a.startTime < b.startTime;
         });
 
     std::vector<PendingMove> remaining;
@@ -23,9 +23,9 @@ static void applyPendingMoves(GameState& state) {
         }
 
         Piece* moving = state.board.grid[pm.fromRow][pm.fromCol];
-        Piece* target = state.board.grid[pm.toRow][pm.toCol];
-
         if (moving == nullptr) continue; // כבר הוזז
+
+        Piece* target = state.board.grid[pm.toRow][pm.toCol];
 
         if (target != nullptr && target->color == moving->color) {
             // נחיתה על ידידותי - מבטלים
@@ -79,7 +79,7 @@ static void handleClick(int x, int y, GameState& state) {
 
     int dist = moveDistance(state.selectedRow, state.selectedCol, row, col);
     state.pending.push_back({state.selectedRow, state.selectedCol, row, col,
-                              state.clock + dist * 1000});
+                              state.clock + dist * 1000, state.clock});
     state.selectedRow = -1;
     state.selectedCol = -1;
 }
