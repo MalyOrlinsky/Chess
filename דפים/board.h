@@ -25,6 +25,7 @@ struct PendingMove {
     int fromRow, fromCol;
     int toRow, toCol;
     int arrivalTime;
+    int startTime;
 };
 
 struct GameState {
