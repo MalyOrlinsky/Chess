@@ -14,8 +14,8 @@ void RealTimeArbiter::startMotion( int fromRow, int fromCol, int toRow, int toCo
         currentClock, currentClock + dist, counter++});
 }
 
-void RealTimeArbiter::startJump(int row, int col) {
-    jumps.push_back({row, col, currentClock, currentClock + config.jumpDuration, counter++});
+void RealTimeArbiter::startJump(int row, int col, int speed) {
+    jumps.push_back({row, col, currentClock, currentClock + speed, counter++});
 }
 
 bool RealTimeArbiter::isMoving(int row, int col) const {

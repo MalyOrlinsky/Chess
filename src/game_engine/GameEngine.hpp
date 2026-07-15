@@ -28,6 +28,8 @@ public:
 
 private:
 
+    std::string pieceCode(const Piece& p);
+
     RuleEngine ruleEngine;
     RealTimeArbiter arbiter;
     controllerClick controller;

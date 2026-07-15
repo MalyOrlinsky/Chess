@@ -97,7 +97,5 @@ AnimConfig SpriteLoader::parseConfig(const std::string& configPath) {
     cfg.isLoop    = extractBool("is_loop");
     cfg.nextState = extractStr("next_state_when_finished");
     cfg.speed_m_per_sec = extractDouble("speed_m_per_sec");
-    cfg.duration_ms = extractInt("duration_ms");
-    cfg.wait_ms = extractInt("wait_ms");
     return cfg;
 }

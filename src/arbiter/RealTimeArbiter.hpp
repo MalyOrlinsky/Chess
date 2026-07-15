@@ -15,7 +15,7 @@ public:
     void setKingCapturedCallback(KingCapturedCallback cb);
     int clock() const;
     void startMotion(int fromRow, int fromCol, int toRow, int toCol, int dist);
-    void startJump(int row, int col);
+    void startJump(int row, int col, int speed);
     bool isMoving(int row, int col) const;
     bool isJumping(int row, int col) const;
     void advanceClock(int ms, Board& board);

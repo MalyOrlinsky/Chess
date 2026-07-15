@@ -48,10 +48,8 @@ void GameEngine::requestMove(CellPos from, CellPos to) {
     Piece* piece = board.getPiece(from.row, from.col);
     if (!piece) return;
 
-    std::string code;
-    code += piece->type;
-    code += (piece->color == Color::White) ? 'W' : 'B';
-
+    std::string code = pieceCode(*board.getPiece(from.row, from.col));
+    
     const AnimConfig& cfg = spriteLoader.getConfig(code, "move");
 
     double speed = cfg.speed_m_per_sec;
@@ -71,7 +69,17 @@ void GameEngine::requestJump(CellPos pos) {
     if (!pos.valid || board.getPiece(pos.row, pos.col) == nullptr) return;
     if (arbiter.isMoving(pos.row, pos.col)) return;
     if (arbiter.isJumping(pos.row, pos.col)) return;
-    arbiter.startJump(pos.row, pos.col);
+    
+    std::string code = pieceCode(*board.getPiece(pos.row, pos.col));
+
+    const AnimConfig& cfg = spriteLoader.getConfig(code, "jump");
+
+    double speed = cfg.speed_m_per_sec;
+
+    if (speed <= 0)
+        return;
+
+    arbiter.startJump(pos.row, pos.col, speed);
 }
 
 void GameEngine::handleWait(int ms) {
@@ -131,4 +139,11 @@ GameSnapshot GameEngine::snapshot() const {
             };
         }
     return snap;
+}
+
+std::string GameEngine::pieceCode(const Piece& p) {
+    std::string code;
+    code += p.type;
+    code += (p.color == Color::White) ? 'W' : 'B';
+    return code;
 }
