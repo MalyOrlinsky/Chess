@@ -7,24 +7,24 @@
 namespace fs = std::filesystem;
 
 const std::vector<Img>& SpriteLoader::getFrames(const std::string& pieceCode,
-                                                  const std::string& state) {
-    const std::string key = pieceCode + "/" + state;
+                                                  const PieceStatus& state) {
+    const std::string key = pieceCode + "/" + PieceStatusToString(state);
     if (cache.find(key) == cache.end())
         cache[key] = load(pieceCode, state);
     return cache[key].frames;
 }
 
 const AnimConfig& SpriteLoader::getConfig(const std::string& pieceCode,
-                                           const std::string& state) {
-    const std::string key = pieceCode + "/" + state;
+                                           const PieceStatus& state) {
+    const std::string key = pieceCode + "/" + PieceStatusToString(state);
     if (cache.find(key) == cache.end())
         cache[key] = load(pieceCode, state);
     return cache[key].config;
 }
 
 SpriteLoader::Entry SpriteLoader::load(const std::string& pieceCode,
-                                        const std::string& state) {
-    std::string stateDir = basePath + "/" + pieceCode + "/states/" + state;
+                                        const PieceStatus& state) {
+    std::string stateDir = basePath + "/" + pieceCode + "/states/" + PieceStatusToString(state);
     Entry entry;
     entry.config = parseConfig(stateDir + "/config.json");
 
@@ -95,7 +95,7 @@ AnimConfig SpriteLoader::parseConfig(const std::string& configPath) {
 
     cfg.fps       = extractInt("frames_per_sec");
     cfg.isLoop    = extractBool("is_loop");
-    cfg.nextState = extractStr("next_state_when_finished");
+    cfg.nextState = StringToPieceStatus(extractStr("next_state_when_finished"));
     cfg.speed_m_per_sec = extractDouble("speed_m_per_sec");
     return cfg;
 }

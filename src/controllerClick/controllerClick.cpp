@@ -1,4 +1,5 @@
 #include "controllerClick.hpp"
+#include <iostream>
 
 ClickResult controllerClick::onClick(CellPos pos, const Board& board, PieceStatus status) {
     if (!pos.valid) {
@@ -7,16 +8,22 @@ ClickResult controllerClick::onClick(CellPos pos, const Board& board, PieceStatu
     }
 
     const Piece* piece = board.grid[pos.row][pos.col].get();
-
+std::cout << "onClick: selected=" << selectedCol << "," << selectedRow << std::endl;
     if (!hasSelection()) {
-        if (piece == nullptr || status == PieceStatus::Move) return {ClickAction::None};
+        std::cout << "onClick: no selection, pos=" << pos.row << "," << pos.col << " status=" << PieceStatusToString(status) << std::endl;
+        if (piece == nullptr || status == PieceStatus::Move ||
+            status == PieceStatus::Jump || status == PieceStatus::ShortReset || 
+            status == PieceStatus::LongReset)
+            return {ClickAction::None};
         selectedRow = pos.row;
         selectedCol = pos.col;
         return {ClickAction::Selected, pos, pos};
     }
 
     if (pos.row == selectedRow && pos.col == selectedCol) {
-        if (status == PieceStatus::Move || status == PieceStatus::Jump) return {ClickAction::None};
+        if (status == PieceStatus::Move || status == PieceStatus::Jump || 
+            status == PieceStatus::ShortReset || status == PieceStatus::LongReset)
+            return {ClickAction::None};
         CellPos sel = {selectedRow, selectedCol, true};
         clearSelection();
         return {ClickAction::JumpRequest, sel, sel};

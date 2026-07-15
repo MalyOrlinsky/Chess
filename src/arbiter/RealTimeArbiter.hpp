@@ -16,6 +16,8 @@ public:
     int clock() const;
     void startMotion(int fromRow, int fromCol, int toRow, int toCol, int dist);
     void startJump(int row, int col, int speed);
+    void startShortRest(int row, int col, int duration);
+    void startLongRest(int row, int col, int duration);
     PieceStatus getStatus(int row, int col) const;
     void advanceClock(int ms, Board& board);
 
@@ -24,6 +26,8 @@ private:
     int counter = 0;
     std::vector<Motion> motions;
     std::vector<Jump> jumps;
+    std::vector<Jump> shortRests;
+    std::vector<Jump> longRests;
     KingCapturedCallback onKingCaptured;
 
     void resolveArrivals(Board& board);
@@ -31,4 +35,5 @@ private:
     void resolveJumpCaptures(std::vector<Motion>& ready, std::vector<bool>& cancelled, Board& board);
     void applyArrivals(std::vector<Motion>& ready, std::vector<bool>& cancelled, Board& board);
     void pruneExpiredJumps();
+    void pruneExpiredRests();
 };

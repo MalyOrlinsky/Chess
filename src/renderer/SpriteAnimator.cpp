@@ -2,7 +2,8 @@
 
 SpriteAnimator::SpriteAnimator(const std::string& pieceCode, SpriteLoader& loader)
     : pieceCode(pieceCode), loader(loader) {
-    enterState("idle");
+    if (state != PieceStatus::Idle)
+        enterState(PieceStatus::Idle);
 }
 
 void SpriteAnimator::tick(int dt) {
@@ -19,28 +20,28 @@ void SpriteAnimator::tick(int dt) {
                 currentFrame = 0;
             } else {
                 currentFrame = frameCount - 1;
-                enterState(cfg.nextState);
+                if (state != cfg.nextState)
+                    enterState(cfg.nextState);
                 return;
             }
         }
     }
 }
 
-void SpriteAnimator::setState(const std::string& newState) {
-    // rest states finish on their own via config.nextState - don't interrupt
-    if (state == "short_rest" || state == "long_rest") return;
-    if (newState != state)
+void SpriteAnimator::setState(const PieceStatus& newState) {
+    if(newState != state)
         enterState(newState);
 }
 
-const std::string& SpriteAnimator::getState() const { return state; }
+const PieceStatus& SpriteAnimator::getState() const { return state; }
 
 const Img& SpriteAnimator::currentImg() const {
     return loader.getFrames(pieceCode, state)[currentFrame];
 }
 
-void SpriteAnimator::enterState(const std::string& newState) {
-    state        = newState;
+void SpriteAnimator::enterState(const PieceStatus& newState) {
+    std::cout << "state " << PieceStatusToString(state) << " -> " << PieceStatusToString(newState) << std::endl;
+    state = newState;
     currentFrame = 0;
-    msAccum      = 0;
+    msAccum = 0;
 }

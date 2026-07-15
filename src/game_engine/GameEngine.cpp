@@ -1,5 +1,6 @@
 #include "GameEngine.hpp"
 #include "../text_io/BoardPrinter.hpp"
+#include "../arbiter/Motion.hpp"
 #include <cmath>
 #include <sstream>
 
@@ -49,7 +50,7 @@ void GameEngine::requestMove(CellPos from, CellPos to) {
 
     std::string code = pieceCode(*board.getPiece(from.row, from.col));
     
-    const AnimConfig& cfg = spriteLoader.getConfig(code, "move");
+    const AnimConfig& cfg = spriteLoader.getConfig(code, PieceStatus::Move);
 
     double speed = cfg.speed_m_per_sec;
 
@@ -70,7 +71,7 @@ void GameEngine::requestJump(CellPos pos) {
     
     std::string code = pieceCode(*board.getPiece(pos.row, pos.col));
 
-    const AnimConfig& cfg = spriteLoader.getConfig(code, "jump");
+    const AnimConfig& cfg = spriteLoader.getConfig(code, PieceStatus::Jump);
 
     double speed = cfg.speed_m_per_sec;
 
@@ -140,7 +141,7 @@ GameSnapshot GameEngine::snapshot() const {
 
 std::string GameEngine::pieceCode(const Piece& p) {
     std::string code;
+    code += (p.color == Color::White) ? 'w' : 'b';
     code += p.type;
-    code += (p.color == Color::White) ? 'W' : 'B';
     return code;
 }

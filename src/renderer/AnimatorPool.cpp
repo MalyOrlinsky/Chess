@@ -16,7 +16,19 @@ void AnimatorPool::update(const GameSnapshot& snap, int dt) {
             alive.insert(key);
 
             SpriteAnimator& anim = getOrCreate(key, pieceKey(cs));
-            anim.setState(stateFromSnapshot(cs));
+            if (anim.getState() != cs.status)
+{
+    std::cout
+        << "STATE CHANGE id="
+        << cs.id
+        << " "
+        << PieceStatusToString(anim.getState())
+        << " -> "
+        << PieceStatusToString(cs.status)
+        << std::endl;
+}
+if (anim.getState() != cs.status)
+            anim.setState(cs.status);
             anim.tick(dt);
         }
     }
@@ -56,15 +68,8 @@ std::string AnimatorPool::animatorKey(const CellSnapshot& cs) {
 
 std::string AnimatorPool::pieceKey(const CellSnapshot& cs) {
     std::string code;
+    code += (cs.color == Color::White) ? 'w' : 'b';
     code += cs.type;
-    code += (cs.color == Color::White) ? 'W' : 'B';
     return code;
 }
 
-std::string AnimatorPool::stateFromSnapshot(const CellSnapshot& cs) {
-    if (cs.isMoving)  return "move";
-    if (cs.isJumping) return "jump";
-    return "idle";
-    // short_rest / long_rest are NOT set from outside -
-    // SpriteAnimator drives them internally via config.nextState
-}

@@ -26,5 +26,4 @@ private:
 
     static std::string animatorKey(const CellSnapshot& cs);
     static std::string pieceKey(const CellSnapshot& cs);
-    static std::string stateFromSnapshot(const CellSnapshot& cs);
 };

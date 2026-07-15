@@ -18,13 +18,27 @@ void RealTimeArbiter::startJump(int row, int col, int speed) {
     jumps.push_back({row, col, currentClock, currentClock + speed, counter++});
 }
 
+void RealTimeArbiter::startShortRest(int row, int col, int duration) {
+    shortRests.push_back({row, col, currentClock, currentClock + duration, counter++});
+}
+
+void RealTimeArbiter::startLongRest(int row, int col, int duration) {
+    longRests.push_back({row, col, currentClock, currentClock + duration, counter++});
+}
+
 PieceStatus RealTimeArbiter::getStatus(int row, int col) const {
     for (auto& m : motions)
-        if ((m.fromRow == row && m.fromCol == col) || (m.toRow == row && m.toCol == col))
+        if (m.fromRow == row && m.fromCol == col)
             return PieceStatus::Move;
     for (auto& j : jumps)
         if (j.row == row && j.col == col && currentClock < j.endTime)
             return PieceStatus::Jump;
+    for (auto& r : shortRests)
+        if (r.row == row && r.col == col && currentClock < r.endTime)
+            return PieceStatus::ShortReset;
+    for (auto& r : longRests)
+        if (r.row == row && r.col == col && currentClock < r.endTime)
+            return PieceStatus::LongReset;
     return PieceStatus::Idle;
 }
 
@@ -32,6 +46,7 @@ void RealTimeArbiter::advanceClock(int ms, Board& board) {
     currentClock += ms;
     resolveArrivals(board);
     pruneExpiredJumps();
+    pruneExpiredRests();
 }
 
 void RealTimeArbiter::resolveArrivals(Board& board) {
@@ -132,4 +147,16 @@ void RealTimeArbiter::pruneExpiredJumps() {
     for (auto& j : jumps)
         if (currentClock <= j.endTime) active.push_back(j);
     jumps = active;
+}
+
+void RealTimeArbiter::pruneExpiredRests() {
+    std::vector<Jump> activeShort;
+    for (auto& r : shortRests)
+        if (currentClock <= r.endTime) activeShort.push_back(r);
+    shortRests = activeShort;
+
+    std::vector<Jump> activeLong;
+    for (auto& r : longRests)
+        if (currentClock <= r.endTime) activeLong.push_back(r);
+    longRests = activeLong;
 }
