@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-enum class Color { White, Black };
+enum class Color { White, Black, None };
 
 class Piece {
 public:

@@ -17,7 +17,7 @@ void ImgRenderer::run() {
     Img::set_mouse_callback(WINDOW_NAME, mouseHandler, this);
 
     auto prev = std::chrono::steady_clock::now();
-    while (true) {
+    while (Img::is_window_open(WINDOW_NAME)) {
         auto now = std::chrono::steady_clock::now();
         int dt = (int)std::chrono::duration_cast<std::chrono::milliseconds>(now - prev).count();
         prev = now;
@@ -34,7 +34,6 @@ void ImgRenderer::run() {
     }
     Img::destroy_windows();
 }
-
 
 Img ImgRenderer::buildFrame(const GameSnapshot& snap) {
     Img canvas = boardImg;

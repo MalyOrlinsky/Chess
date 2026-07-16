@@ -40,5 +40,9 @@ ClickResult controllerClick::onClick(CellPos pos, const Board& board, PieceStatu
     return {ClickAction::MoveRequest, from, pos};
 }
 
+std::pair<int, int> controllerClick::getSelected() const {
+    return {selectedRow, selectedCol};
+}
+
 bool controllerClick::hasSelection() const { return selectedRow != -1; }
 void controllerClick::clearSelection() { selectedRow = -1; selectedCol = -1; }

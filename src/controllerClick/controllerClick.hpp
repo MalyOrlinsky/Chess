@@ -9,6 +9,7 @@ public:
     ClickResult onClick(CellPos pos, const Board& board, PieceStatus status);
     bool hasSelection() const;
     void clearSelection();
+    std::pair<int, int> getSelected() const;
 
 private:
     int selectedRow = -1;

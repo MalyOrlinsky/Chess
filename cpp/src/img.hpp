@@ -46,6 +46,8 @@ public:
     const cv::Mat& get_mat() const { return img; }
     bool is_loaded() const { return !img.empty(); }
 
+    void draw_rectangle(int x, int y, int width, int height, const cv::Scalar& color, int thickness = 1);
+    static bool is_window_open(const std::string& window_name);
 private:
     cv::Mat img;
 };

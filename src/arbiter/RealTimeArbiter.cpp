@@ -14,7 +14,11 @@ void RealTimeArbiter::advanceClock(int ms, Board &board)
 {
     currentClock += ms;
 
+    Color kingColor = Color::None;
     auto finished = motionUpdater.update(motions, jumps, board, currentClock);
+
+    if (kingColor != Color::None)
+        onKingCaptured(kingColor);
 
     for (const auto &motion : finished)
     {

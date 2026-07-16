@@ -31,9 +31,9 @@ void MotionAdvancer::advance(Motion& motion, std::vector<Motion>& motions, const
 
     board.movePiece(current.row, current.col, next.row, next.col);
 
-    // int lastRow = board.getPiece(current.row, current.col)->color == Color::White ? board.rows - 1 : 0;
-    // if (next.row == lastRow)
-    //     board.promotePiece(next.row, next.col);
+    int lastRow = board.getPiece(next.row, next.col)->color == Color::White ? 0 : board.rows - 1;
+    if (next.row == lastRow)
+        board.promotePiece(next.row, next.col);
 
     ++motion.currentStep;
 }

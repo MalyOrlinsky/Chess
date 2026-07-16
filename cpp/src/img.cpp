@@ -87,7 +87,7 @@ void Img::show_in(const std::string& window_name) {
 }
 
 void Img::create_window(const std::string& window_name) {
-    cv::namedWindow(window_name);
+    cv::namedWindow(window_name, cv::WINDOW_NORMAL);
 }
 
 void Img::set_mouse_callback(const std::string& window_name,
@@ -102,4 +102,15 @@ int Img::wait_key(int delay_ms) {
 
 void Img::destroy_windows() {
     cv::destroyAllWindows();
+}
+
+void Img::draw_rectangle(int x, int y, int width, int height, const cv::Scalar& color, int thickness) {
+    if (img.empty())
+        throw std::runtime_error("Image not loaded.");
+
+    cv::rectangle(img, cv::Rect(x, y, width, height), color, thickness);
+}
+
+bool Img::is_window_open(const std::string& window_name) {
+    return cv::getWindowProperty(window_name, cv::WND_PROP_VISIBLE) >= 1;
 }

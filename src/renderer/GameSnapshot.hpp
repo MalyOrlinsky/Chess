@@ -16,6 +16,8 @@ struct GameSnapshot {
     std::vector<std::vector<CellSnapshot>> cells;
     bool gameOver = false;
     std::string winner;
+    int selectedRow = -1;
+    int selectedCol = -1;
 
     std::string playerWhite;
     std::string playerBlack;

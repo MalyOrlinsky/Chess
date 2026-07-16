@@ -122,6 +122,9 @@ GameSnapshot GameEngine::snapshot() const {
     GameSnapshot snap;
     snap.rows     = board.rows;
     snap.cols     = board.cols;
+    std::pair<int,int> sel = controller.getSelected();
+    snap.selectedRow = sel.first;
+    snap.selectedCol = sel.second;
     snap.gameOver = gameOver;
     snap.winner   = winner;
     snap.cells.resize(board.rows, std::vector<CellSnapshot>(board.cols));

@@ -46,8 +46,12 @@ void AnimatorPool::drawAll(Img &canvas, const GameSnapshot &snap)
             std::string key = animatorKey(cs);
             animators.at(key).setState(cs.status);
             const Img &frame = animators.at(key).currentImg();
-            const_cast<Img &>(frame).draw_on(canvas,
-                                             c * CELL_SIZE_PX, r * CELL_SIZE_PX);
+            const_cast<Img &>(frame).draw_on(canvas, c * CELL_SIZE_PX, r * CELL_SIZE_PX);
+            
+            if (r == snap.selectedRow && c == snap.selectedCol)
+                canvas.draw_rectangle(c * CELL_SIZE_PX, r * CELL_SIZE_PX, CELL_SIZE_PX, CELL_SIZE_PX,
+                                        cv::Scalar(0, 255, 255, 255), 3);
+
         }
     }
 }
