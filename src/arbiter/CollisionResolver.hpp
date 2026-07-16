@@ -7,11 +7,12 @@ enum class CollisionResult
 {
     Continue,
     Stop,
-    Finish
+    Finish,
+    Died
 };
 
 class CollisionResolver
 {
 public:
-    CollisionResult resolve(const Motion &motion, Board &board) const;
+    CollisionResult resolve(const Motion &motion, std::vector<Jump> jumps, Board &board) const;
 };

@@ -12,7 +12,8 @@ class MotionUpdater
 {
 public:
 
-    std::vector<Motion> update(std::vector<Motion>& motions, const std::vector<Jump>& jumps, Board& board, int currentClock);
+    std::vector<Motion> update(std::vector<Motion>& motions, const std::vector<Jump>& jumps,
+         Board& board, int currentClock, Color& color);
 
 private:
 

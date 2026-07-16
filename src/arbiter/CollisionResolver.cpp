@@ -1,6 +1,6 @@
 #include "CollisionResolver.hpp"
 
-CollisionResult CollisionResolver::resolve(const Motion& motion, Board& board) const {
+CollisionResult CollisionResolver::resolve(const Motion& motion, std::vector<Jump> jumps, Board& board) const {
     if (motion.currentStep + 1 >= static_cast<int>(motion.path.size()))
         return CollisionResult::Finish;
 
@@ -16,6 +16,10 @@ CollisionResult CollisionResolver::resolve(const Motion& motion, Board& board) c
 
     if (target == nullptr)
         return CollisionResult::Continue;
+
+    for (auto j : jumps)
+        if (j.row == next.row && j.col == next.col)
+            return CollisionResult::Died;
 
     // if (motion.canSkip)
     //     return CollisionResult::Continue;

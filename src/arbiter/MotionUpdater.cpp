@@ -1,6 +1,7 @@
 #include "MotionUpdater.hpp"
 
-std::vector<Motion> MotionUpdater::update(std::vector<Motion>& motions, const std::vector<Jump>& jumps, Board& board, int currentClock) {
+std::vector<Motion> MotionUpdater::update(std::vector<Motion>& motions, const std::vector<Jump>& jumps,
+     Board& board, int currentClock, Color& color) {
     CollisionResolver resolver;
     MotionAdvancer advancer;
 
@@ -15,14 +16,20 @@ std::vector<Motion> MotionUpdater::update(std::vector<Motion>& motions, const st
             continue;
         }
 
-        CollisionResult result = resolver.resolve(motion, board);
+        CollisionResult result = resolver.resolve(motion, jumps, board);
         if (result == CollisionResult::Stop)
         {
             finished.push_back(motion);
             continue;
         }
 
-        advancer.advance(motion, motions, jumps, board, currentClock);
+        if (result == CollisionResult::Died)
+        {
+            advancer.died(motion, board, color);
+            continue;
+        }
+
+        advancer.advance(motion, motions, jumps, board, currentClock, color);
         if (result == CollisionResult::Finish || motion.currentStep >= static_cast<int>(motion.path.size()) - 1)
         {
             finished.push_back(motion);

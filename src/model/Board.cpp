@@ -1,4 +1,5 @@
 #include "Board.hpp"
+#include <iostream>
 
 Piece* Board::getPiece(int row, int col) const {
     return grid[row][col].get();
@@ -16,6 +17,8 @@ void Board::removePiece(int row, int col) {
 
 Piece* Board::movePiece(int fromRow, int fromCol, int toRow, int toCol) {
     Piece* capturedPiece = nullptr;
+             std::cout << "fdgdg " << std::endl;
+
     if (grid[toRow][toCol]) {
         capturedPiece = getPiece(toRow, toCol);
     }
