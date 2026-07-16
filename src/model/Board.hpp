@@ -11,7 +11,7 @@ struct Board {
     Piece* getPiece(int row, int col) const;
     void addRow(std::vector<std::unique_ptr<Piece>> row);
     void removePiece(int row, int col);
-    char movePiece(int fromRow, int fromCol, int toRow, int toCol);
+    Piece* movePiece(int fromRow, int fromCol, int toRow, int toCol);
     void promotePiece(int row, int col);
     bool isPathClear(int fromRow, int fromCol, int toRow, int toCol) const;
 };

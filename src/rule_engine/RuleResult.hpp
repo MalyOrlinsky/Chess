@@ -5,5 +5,6 @@ enum class RuleResult {
     OutsideBoard,
     EmptySource,
     FriendlyDestination,
-    IllegalPieceMove
+    IllegalPieceMove,
+    BlockingTool
 };

@@ -20,19 +20,6 @@ void AnimatorPool::update(const GameSnapshot &snap, int dt)
             alive.insert(key);
 
             SpriteAnimator &anim = getOrCreate(key, pieceKey(cs));
-            // if (anim.getState() != cs.status)
-            // {
-            //     std::cout
-            //         << "STATE CHANGE id="
-            //         << cs.id
-            //         << " "
-            //         << PieceStatusToString(anim.getState())
-            //         << " -> "
-            //         << PieceStatusToString(cs.status)
-            //         << std::endl;
-            // }
-            // if (anim.getState() != cs.status)
-            //     anim.setState(cs.status);
             anim.tick(dt);
         }
     }
@@ -55,8 +42,7 @@ void AnimatorPool::drawAll(Img &canvas, const GameSnapshot &snap)
             const CellSnapshot &cs = snap.cells[r][c];
             if (cs.type == 0)
                 continue;
-            if (cs.status == PieceStatus::Jump)
-                std::cout << "DRAWING type=" << cs.type << " color=" << (cs.color == Color::White ? 'w' : 'b') << " status=" << PieceStatusToString(cs.status) << std::endl;
+
             std::string key = animatorKey(cs);
             animators.at(key).setState(cs.status);
             const Img &frame = animators.at(key).currentImg();

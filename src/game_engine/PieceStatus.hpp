@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 
 enum class PieceStatus { Idle, ShortReset, LongReset, Move, Jump };

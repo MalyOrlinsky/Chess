@@ -14,12 +14,13 @@ void Board::removePiece(int row, int col) {
     grid[row][col].reset();
 }
 
-char Board::movePiece(int fromRow, int fromCol, int toRow, int toCol) {
-    char capturedType = 0;
-    if (grid[toRow][toCol])
-        capturedType = grid[toRow][toCol]->type;
+Piece* Board::movePiece(int fromRow, int fromCol, int toRow, int toCol) {
+    Piece* capturedPiece = nullptr;
+    if (grid[toRow][toCol]) {
+        capturedPiece = getPiece(toRow, toCol);
+    }
     grid[toRow][toCol] = std::move(grid[fromRow][fromCol]);
-    return capturedType;
+    return capturedPiece;
 }
 
 void Board::promotePiece(int row, int col) {
@@ -43,7 +44,7 @@ bool Board::isPathClear(int fromRow, int fromCol, int toRow, int toCol) const {
     bool diagonal = (abs(toRow - fromRow) == abs(toCol - fromCol));
 
     if (!straight && !diagonal)
-        return false;
+        return true;
 
     int r = fromRow + rowStep;
     int c = fromCol + colStep;

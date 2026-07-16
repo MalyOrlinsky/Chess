@@ -61,7 +61,7 @@ void GameEngine::requestMove(CellPos from, CellPos to) {
 
     int duration = static_cast<int>((dist * speed) * 1000);
 
-    arbiter.startMotion( from.row, from.col, to.row, to.col, duration);
+    arbiter.startMotion( from.row, from.col, to.row, to.col, duration, board);
 }
 
 void GameEngine::requestJump(CellPos pos) {
@@ -138,3 +138,4 @@ GameSnapshot GameEngine::snapshot() const {
         }
     return snap;
 }
+

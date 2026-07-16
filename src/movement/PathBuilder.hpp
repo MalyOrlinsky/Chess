@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../model/Board.hpp"
-#include "Motion.hpp"
+#include "../arbiter/Motion.hpp"
 
 
 class PathBuilder

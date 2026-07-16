@@ -24,6 +24,9 @@ RuleResult RuleEngine::validate(int fromRow, int fromCol, int toRow, int toCol,
     if (rule == nullptr || !rule->canMove(fromRow, fromCol, toRow, toCol, board))
         return RuleResult::IllegalPieceMove;
 
+    if (!board.isPathClear(fromRow, fromCol, toRow, toCol))
+        return RuleResult::BlockingTool;
+
     return RuleResult::Ok;
 }
 

@@ -7,5 +7,5 @@ bool BishopRule::canMove(int fromRow, int fromCol, int toRow, int toCol,
     int dr = (toRow > fromRow) ? 1 : -1;
     int dc = (toCol > fromCol) ? 1 : -1;
 
-    return board.isPathClear(fromRow, fromCol, toRow, toCol);
+    return true;
 }

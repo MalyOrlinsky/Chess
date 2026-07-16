@@ -40,7 +40,6 @@ const Img& SpriteAnimator::currentImg() const {
 }
 
 void SpriteAnimator::enterState(const PieceStatus& newState) {
-    std::cout << "state " << PieceStatusToString(state) << " -> " << PieceStatusToString(newState) << std::endl;
     state = newState;
     currentFrame = 0;
     msAccum = 0;
