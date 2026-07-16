@@ -1,6 +1,6 @@
 #pragma once
 #include "../../cpp/src/img.hpp"
-#include "../arbiter/Motion.hpp"
+#include "../game_engine/PieceStatus.hpp"
 #include "../config/AnimConfig.hpp"
 #include "../config/PieceConfigManager.hpp"
 #include "../model/Piece.hpp"
@@ -25,7 +25,7 @@ private:
         AnimConfig config;
     };
 
-    std::map<std::string, Entry> cache;  // key: "PW/idle"
+    std::map<std::string, Entry> cache;
 
     Entry load(const std::string& pieceCode, const PieceStatus& state);
 };

@@ -78,7 +78,7 @@ void GameEngine::requestJump(CellPos pos) {
     if (speed <= 0)
         return;
 
-    arbiter.startJump(pos.row, pos.col, speed);
+    arbiter.startJump(pos.row, pos.col, speed * 1000);
 }
 
 void GameEngine::handleWait(int ms) {

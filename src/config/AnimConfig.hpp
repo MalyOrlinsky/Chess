@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "../arbiter/Motion.hpp"
+#include "../game_engine/PieceStatus.hpp"
 
 struct AnimConfig {
     int fps = 0;

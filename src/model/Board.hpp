@@ -13,4 +13,5 @@ struct Board {
     void removePiece(int row, int col);
     char movePiece(int fromRow, int fromCol, int toRow, int toCol);
     void promotePiece(int row, int col);
+    bool isPathClear(int fromRow, int fromCol, int toRow, int toCol) const;
 };

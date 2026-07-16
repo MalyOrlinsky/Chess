@@ -13,6 +13,7 @@ public:
     virtual ~Piece() = default;
 
     virtual Piece* onReachLastRow() const { return nullptr; }
+    virtual bool canSkip() const { return false; }
     std::string toString() const;
 
 private:

@@ -2,7 +2,7 @@
 #include "CellPos.hpp"
 #include "ClickResult.hpp"
 #include "../model/Board.hpp"
-#include "../arbiter/Motion.hpp"
+#include "../game_engine/PieceStatus.hpp"
 
 class controllerClick {
 public:

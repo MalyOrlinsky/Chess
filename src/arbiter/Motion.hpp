@@ -1,52 +1,34 @@
 #pragma once
-#include <string>
+#include <vector>
 
-enum class PieceStatus { Idle, ShortReset, LongReset, Move, Jump };
-
-inline std::string PieceStatusToString(PieceStatus state)
+struct Position
 {
-    switch (state)
-    {
-        case PieceStatus::Idle:       return "idle";
-        case PieceStatus::ShortReset: return "short_rest";
-        case PieceStatus::LongReset:  return "long_rest";
-        case PieceStatus::Move:       return "move";
-        case PieceStatus::Jump:       return "jump";
-    }
-    return "idle";
-}
-
-inline PieceStatus StringToPieceStatus(const std::string& state)
-{
-    if (state == "idle")
-        return PieceStatus::Idle;
-
-    if (state == "short_rest")
-        return PieceStatus::ShortReset;
-
-    if (state == "long_rest")
-        return PieceStatus::LongReset;
-
-    if (state == "move")
-        return PieceStatus::Move;
-
-    if (state == "jump")
-        return PieceStatus::Jump;
-
-    return PieceStatus::Idle;
-}
-
-struct Motion {
-    int fromRow, fromCol;
-    int toRow, toCol;
-    int startTime;
-    int arrivalTime;
-    int order;
+    int row;
+    int col;
 };
 
-struct Jump {
-    int row, col;
+struct Motion
+{
+    std::vector<Position> path;
+
+    int currentStep = 0;
+
+    int startTime = 0;
+    int stepDuration = 0;
+
+    int order = 0;
+
+    bool canSkip = false;
+};
+
+
+struct Jump
+{
+    int row;
+    int col;
+
     int startTime;
     int endTime;
+
     int order;
 };

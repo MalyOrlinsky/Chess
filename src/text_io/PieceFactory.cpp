@@ -1,6 +1,7 @@
 #include "PieceFactory.hpp"
 
 Piece* Pawn::onReachLastRow() const { return new Queen(color); }
+bool Knight::canSkip() const { return true; }
 
 std::unique_ptr<Piece> PieceFactory::make(const std::string& token) {
     if (token == "." || token.size() != 2) return nullptr;

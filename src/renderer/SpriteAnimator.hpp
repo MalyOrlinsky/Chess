@@ -12,9 +12,9 @@ public:
     const Img& currentImg() const;
 
 private:
-    std::string   pieceCode;
+    std::string pieceCode;
     SpriteLoader& loader;
-    PieceStatus   state;
+    PieceStatus state;
     int currentFrame = 0;
     int msAccum = 0;
 

@@ -32,6 +32,7 @@ void RealTimeArbiter::pruneExpiredJumps(Board& board)
     {
         if (currentClock <= j.endTime)
         {
+            std::cout << "jump active: row=" << j.row << " col=" << j.col << " startTime=" << j.startTime << " endTime=" << j.endTime << std::endl;
             active.push_back(j);
             continue;
         }
@@ -42,8 +43,9 @@ void RealTimeArbiter::pruneExpiredJumps(Board& board)
             continue;
 
         PieceStatus next = getNextState(*piece, PieceStatus::Jump);
+        std::cout << "piece=" << piece->toString() << " from Jump to " << PieceStatusToString(next) << std::endl;
 
-        enqueueNextState(*piece, next, j.row, j.col, j.endTime - j.startTime);
+        enqueueNextState(next, j.row, j.col, j.endTime - j.startTime);
     }
 
     jumps = active;
@@ -68,7 +70,7 @@ void RealTimeArbiter::pruneExpiredRests(Board& board)
 
         PieceStatus next =  getNextState(*piece, PieceStatus::ShortReset);
 
-        enqueueNextState(*piece, next, r.row, r.col, SHORT_REST_DURATION);
+        enqueueNextState(next, r.row, r.col, SHORT_REST_DURATION);
     }
 
     shortRests = activeShort;
@@ -90,7 +92,7 @@ void RealTimeArbiter::pruneExpiredRests(Board& board)
 
         PieceStatus next = getNextState(*piece, PieceStatus::LongReset);
 
-        enqueueNextState(*piece, next, r.row, r.col, LONG_REST_DURATION);
+        enqueueNextState(next, r.row, r.col, LONG_REST_DURATION);
     }
 
     longRests = activeLong;
@@ -107,15 +109,7 @@ void RealTimeArbiter::startMotion( int fromRow, int fromCol, int toRow, int toCo
 }
 
 void RealTimeArbiter::startJump(int row, int col, int speed) {
-    jumps.push_back({row, col, currentClock, currentClock + speed, counter++});
-}
-
-void RealTimeArbiter::startShortRest(int row, int col, int duration) {
-    shortRests.push_back({row, col, currentClock, currentClock + duration, counter++});
-}
-
-void RealTimeArbiter::startLongRest(int row, int col, int duration) {
-    longRests.push_back({row, col, currentClock, currentClock + duration, counter++});
+    enqueueNextState(PieceStatus::Jump, row, col, speed);
 }
 
 PieceStatus RealTimeArbiter::getStatus(int row, int col) const {
@@ -216,6 +210,8 @@ void RealTimeArbiter::applyArrivals(std::vector<Motion>& ready, std::vector<bool
         Color movingColor = moving->color;
 
         board.movePiece(m.fromRow, m.fromCol, m.toRow, m.toCol);
+        PieceStatus next = getNextState(*board.getPiece(m.toRow, m.toCol), PieceStatus::Move);
+        enqueueNextState(next, m.toRow, m.toCol, LONG_REST_DURATION);
 
         int lastRow = (movingColor == Color::White) ? 0 : board.rows - 1;
         if (m.toRow == lastRow)
@@ -227,16 +223,13 @@ void RealTimeArbiter::applyArrivals(std::vector<Motion>& ready, std::vector<bool
     }
 }
 
-void RealTimeArbiter::enqueueNextState(const Piece& piece,  PieceStatus nextState,
-                                       int row, int col, int duration)
+void RealTimeArbiter::enqueueNextState(PieceStatus nextState, int row, int col, int duration)
 {
+    std::cout << "enqueueNextState: nextState=" << PieceStatusToString(nextState) << " row=" << row << " col=" << col << " duration=" << duration << std::endl;
     switch (nextState)
     {
         case PieceStatus::Move:
-            motions.push_back({row, col, row, col, currentClock, 
-                currentClock + duration, counter++});
             break;
-
         case PieceStatus::Jump:
             jumps.push_back({row, col, currentClock, currentClock + duration,
                 counter++});

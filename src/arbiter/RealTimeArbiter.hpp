@@ -1,5 +1,6 @@
 #pragma once
 #include "Motion.hpp"
+#include "../game_engine/PieceStatus.hpp"
 #include "../model/Board.hpp"
 #include "../Constants.hpp"
 #include "../config/SpriteLoader.hpp"
@@ -17,12 +18,9 @@ public:
     int clock() const;
     void startMotion(int fromRow, int fromCol, int toRow, int toCol, int dist);
     void startJump(int row, int col, int speed);
-    void startShortRest(int row, int col, int duration);
-    void startLongRest(int row, int col, int duration);
     PieceStatus getStatus(int row, int col) const;
     void advanceClock(int ms, Board& board);
-    void enqueueNextState(const Piece& piece,  PieceStatus nextState,
-                          int row, int col, int duration);
+    void enqueueNextState(PieceStatus nextState, int row, int col, int duration);
     PieceStatus getNextState(const Piece& piece, PieceStatus currentState);
 
 private:

@@ -28,3 +28,33 @@ void Board::promotePiece(int row, int col) {
         grid[row][col].reset(promoted);
     }
 }
+
+bool Board::isPathClear(int fromRow, int fromCol, int toRow, int toCol) const {
+    int rowStep = 0;
+    int colStep = 0;
+
+    if (toRow > fromRow) rowStep = 1;
+    else if (toRow < fromRow) rowStep = -1;
+
+    if (toCol > fromCol) colStep = 1;
+    else if (toCol < fromCol) colStep = -1;
+
+    bool straight = (fromRow == toRow || fromCol == toCol);
+    bool diagonal = (abs(toRow - fromRow) == abs(toCol - fromCol));
+
+    if (!straight && !diagonal)
+        return false;
+
+    int r = fromRow + rowStep;
+    int c = fromCol + colStep;
+
+    while (r != toRow || c != toCol) {
+        if (grid[r][c] != nullptr)
+            return false;
+
+        r += rowStep;
+        c += colStep;
+    }
+
+    return true;
+}

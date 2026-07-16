@@ -1,5 +1,5 @@
 #pragma once
-#include "../arbiter/Motion.hpp"
+#include "../game_engine/PieceStatus.hpp"
 #include "AnimConfig.hpp"
 #include <string>
 #include <map>

@@ -1,6 +1,6 @@
 #pragma once
 #include "../model/Piece.hpp"
-#include "../arbiter/Motion.hpp"
+#include "../game_engine/PieceStatus.hpp"
 #include <vector>
 #include <string>
 
@@ -17,7 +17,6 @@ struct GameSnapshot {
     bool gameOver = false;
     std::string winner;
 
-    // UI fields
     std::string playerWhite;
     std::string playerBlack;
     int scoreWhite = 0;

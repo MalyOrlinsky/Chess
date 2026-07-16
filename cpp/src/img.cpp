@@ -21,7 +21,6 @@ Img& Img::read(const std::string& path,
     if (img.empty())
         throw std::runtime_error("Cannot load image: " + path);
 
-    // Normalize to BGRA always so draw_on always works
     if (img.channels() == 3)
         cv::cvtColor(img, img, cv::COLOR_BGR2BGRA);
 
