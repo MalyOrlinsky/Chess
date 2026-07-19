@@ -72,7 +72,7 @@ PieceStatus RealTimeArbiter::getStatus(int row, int col) const
 {
     for (const auto &motion : motions)
     {
-        if (motion.currentStep >= static_cast<int>(motion.path.size()))
+        if (motion.currentStep >= static_cast<int>(motion.path.size()) || !motion.valid)
             continue;
 
         const Position &pos = motion.path[motion.currentStep];

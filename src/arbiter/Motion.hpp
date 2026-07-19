@@ -11,6 +11,8 @@ struct Motion
 {
     std::vector<Position> path;
 
+    bool valid = true;
+
     int currentStep = 0;
 
     int startTime = 0;

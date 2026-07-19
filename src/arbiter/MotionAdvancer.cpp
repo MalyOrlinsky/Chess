@@ -13,34 +13,24 @@ void MotionAdvancer::advance(Motion &motion, std::vector<Motion> &motions, const
     const Piece *piece = board.getPiece(next.row, next.col);
     if (piece)
     {
-        std::cout << "piece " << piece->type << " died" << std::endl;
         if (piece->type == KING_TYPE)
             color = piece->color == Color::White ? Color::White : Color::Black;
-        std::vector<Motion> motionsActive;
 
         for (auto &m : motions)
         {
-         std::cout << "1 " << std::endl;
-           if (m.path.size() <= m.currentStep)
+            if (m.path.size() <= m.currentStep)
                 continue;
 
-            if (m.path[m.currentStep].row != next.row || m.path[m.currentStep].col != next.col)
-                motionsActive.push_back(m);
+            if (m.path[m.currentStep].row == next.row || m.path[m.currentStep].col == next.col)
+                m.valid = false;
         }
-         std::cout << "2" << std::endl;
-
-        motions = motionsActive;
     }
-         std::cout << "3" << std::endl;
 
     board.movePiece(current.row, current.col, next.row, next.col);
-         std::cout << "12 " << std::endl;
 
     int lastRow = board.getPiece(next.row, next.col)->color == Color::White ? 0 : board.rows - 1;
-         std::cout << "4 " << std::endl;
     if (next.row == lastRow)
         board.promotePiece(next.row, next.col);
-         std::cout << "5" << std::endl;
 
     ++motion.currentStep;
 }

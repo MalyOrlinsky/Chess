@@ -1,4 +1,5 @@
 #include "CollisionResolver.hpp"
+#include <iostream>
 
 CollisionResult CollisionResolver::resolve(const Motion& motion, std::vector<Jump> jumps, Board& board) const {
     if (motion.currentStep + 1 >= static_cast<int>(motion.path.size()))

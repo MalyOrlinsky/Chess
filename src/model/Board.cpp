@@ -2,6 +2,7 @@
 #include <iostream>
 
 Piece* Board::getPiece(int row, int col) const {
+    if (grid[row][col] == nullptr) return nullptr;
     return grid[row][col].get();
 }
 
@@ -17,17 +18,18 @@ void Board::removePiece(int row, int col) {
 
 Piece* Board::movePiece(int fromRow, int fromCol, int toRow, int toCol) {
     Piece* capturedPiece = nullptr;
-             std::cout << "fdgdg " << std::endl;
-
-    if (grid[toRow][toCol]) {
+    if (getPiece(toRow, toCol) != nullptr)
         capturedPiece = getPiece(toRow, toCol);
-    }
+
     grid[toRow][toCol] = std::move(grid[fromRow][fromCol]);
+    
     return capturedPiece;
 }
 
 void Board::promotePiece(int row, int col) {
-    Piece* promoted = grid[row][col]->onReachLastRow();
+    auto piece = getPiece(row, col);
+    if (!piece) return;
+    Piece* promoted = piece->onReachLastRow();
     if (promoted) {
         grid[row][col].reset(promoted);
     }
