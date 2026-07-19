@@ -23,7 +23,7 @@ GameEngine::GameEngine()
 {
         arbiter.setKingCapturedCallback([this](Color w) {
         gameOver = true;
-        winner = (w == Color::White) ? "white" : "black";
+        winner = (w == Color::Black) ? "white" : "black";
         arbiter = RealTimeArbiter("assets/pieces2");
     });
 }
