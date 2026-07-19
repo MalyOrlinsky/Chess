@@ -11,6 +11,7 @@ public:
 
     Img(const Img& other);
     Img& operator=(const Img& other);
+    Img(int width, int height, const cv::Scalar& background = cv::Scalar(180, 180, 180, 255));
 
     Img& read(const std::string& path,
               const std::pair<int, int>& size = {},

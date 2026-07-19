@@ -1,6 +1,7 @@
 #pragma once
 #include "../model/Piece.hpp"
 #include "../game_engine/PieceStatus.hpp"
+#include "../arbiter/Motion.hpp"
 #include <vector>
 #include <string>
 
@@ -19,9 +20,12 @@ struct GameSnapshot {
     int selectedRow = -1;
     int selectedCol = -1;
 
+    std::vector<Motion> motions;
+
     std::string playerWhite;
     std::string playerBlack;
     int scoreWhite = 0;
     int scoreBlack = 0;
-    std::vector<std::string> movesLog;
+    std::vector<std::string> movesLogBlack;
+    std::vector<std::string> movesLogWhite;
 };

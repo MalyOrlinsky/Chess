@@ -28,7 +28,7 @@ public:
 
     PieceStatus getStatus(int row, int col) const;
 
-    void advanceClock(int ms, Board& board);
+    std::pair<int, int> advanceClock(int ms, Board& board);
 
 private:
 

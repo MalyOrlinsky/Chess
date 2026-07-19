@@ -21,10 +21,14 @@ public:
     void setClickCallback(ClickCallback cb);
     void setWaitCallback(WaitCallback cb);
     void setSnapCallback(SnapCallback cb);
-
+    void drawMoveList(Img& canvas, const std::vector<std::string>& moves, int startY, int maxY);
+    
     void run();
 
 private:
+    void drawPlayers(Img& canvas, const GameSnapshot& snap);
+    void drawMoves(Img& canvas, const GameSnapshot& snap);
+
     static constexpr const char* WINDOW_NAME = "Kung-Fu Chess";
 
     SpriteLoader loader;

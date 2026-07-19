@@ -2,7 +2,7 @@
 #include <iostream>
 
 std::vector<Motion> MotionUpdater::update(std::vector<Motion>& motions, const std::vector<Jump>& jumps,
-     Board& board, int currentClock, Color& color) {
+     Board& board, int currentClock, Color& color, std::pair<int, int>& score) {
     CollisionResolver resolver;
     MotionAdvancer advancer;
 
@@ -27,12 +27,16 @@ std::vector<Motion> MotionUpdater::update(std::vector<Motion>& motions, const st
 
         if (result == CollisionResult::Died)
         {
-            advancer.died(motion, board, color);
+            std::pair<int, int> scoreTemp = advancer.died(motion, board, color);
+            score.first += scoreTemp.first;
+            score.second += scoreTemp.second;
             motion.valid = false;
             continue;
         }
 
-        advancer.advance(motion, motions, jumps, board, currentClock, color);
+        std::pair<int, int> scoreTemp = advancer.advance(motion, motions, jumps, board, currentClock, color);
+        score.first += scoreTemp.first;
+        score.second += scoreTemp.second;
         if (result == CollisionResult::Finish || motion.currentStep >= static_cast<int>(motion.path.size()) - 1)
         {
             finished.push_back(motion);

@@ -7,6 +7,11 @@ Img::Img(const Img& other) {
     img = other.img.clone();
 }
 
+Img::Img(int width, int height, const cv::Scalar& background)
+{
+    img = cv::Mat(height, width, CV_8UC4, background);
+}
+
 Img& Img::operator=(const Img& other) {
     if (this != &other)
         img = other.img.clone();
@@ -67,9 +72,7 @@ void Img::put_text(const std::string& txt, int x, int y, double font_size,
                    const cv::Scalar& color, int thickness) {
     if (img.empty())
         throw std::runtime_error("Image not loaded.");
-    cv::putText(img, txt, cv::Point(x, y),
-                cv::FONT_HERSHEY_SIMPLEX, font_size,
-                color, thickness, cv::LINE_AA);
+    cv::putText(img, txt, cv::Point(x, y), cv::FONT_HERSHEY_COMPLEX, font_size, color, thickness, cv::LINE_AA);
 }
 
 void Img::show() {

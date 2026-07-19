@@ -10,12 +10,13 @@ PieceStatus RealTimeArbiter::getNextState(const Piece &piece, PieceStatus curren
     return spriteLoader.configManager.getConfig(code, currentState).nextState;
 }
 
-void RealTimeArbiter::advanceClock(int ms, Board &board)
+std::pair<int, int> RealTimeArbiter::advanceClock(int ms, Board &board)
 {
     currentClock += ms;
 
     Color color = Color::None;
-    auto finished = motionUpdater.update(motions, jumps, board, currentClock, color);
+    std::pair<int, int> score = {0, 0};
+    auto finished = motionUpdater.update(motions, jumps, board, currentClock, color, score);
 
     if (color != Color::None)
         onKingCaptured(color);
@@ -28,6 +29,8 @@ void RealTimeArbiter::advanceClock(int ms, Board &board)
 
     pruneExpiredJumps(board);
     pruneExpiredRests(board);
+
+    return score;
 }
 
 void RealTimeArbiter::setKingCapturedCallback(KingCapturedCallback cb)
