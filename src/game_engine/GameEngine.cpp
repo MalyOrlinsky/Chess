@@ -28,6 +28,17 @@ GameEngine::GameEngine()
     });
 }
 
+int GameEngine::rows() const
+{
+    return board.rows;
+}
+
+
+int GameEngine::cols() const
+{
+    return board.cols;
+}
+
 void GameEngine::handleClick(CellPos pos) {
     if (gameOver) return;
     PieceStatus status = pos.valid ? arbiter.getStatus(pos.row, pos.col) : PieceStatus::Idle;
@@ -112,13 +123,17 @@ void GameEngine::execute(const std::string& cmd) {
         case CommandType::Click: {
             if (gameOver) break;
             auto [x, y] = parseXY(cmd.substr(6));
-            handleClick(mapper.toCell(x, y, board.rows, board.cols));
+            CellPos pos = mapper.toCell(x, y, board.rows, board.cols, 
+                                        cols() * CELL_SIZE_PX, rows() * CELL_SIZE_PX);
+            handleClick(pos);
             break;
         }
         case CommandType::Jump: {
             if (gameOver) break;
             auto [x, y] = parseXY(cmd.substr(5));
-            requestJump(mapper.toCell(x, y, board.rows, board.cols));
+            CellPos pos = mapper.toCell(x, y, board.rows, board.cols, 
+                                        cols() * CELL_SIZE_PX, rows() * CELL_SIZE_PX);
+            requestJump(pos);
             break;
         }
         case CommandType::Wait: {
@@ -135,48 +150,18 @@ void GameEngine::execute(const std::string& cmd) {
 
 int GameEngine::clock() const { return arbiter.clock(); }
 
-GameSnapshot GameEngine::snapshot() const {
-    GameSnapshot snap;
-
-    snap.rows = board.rows;
-    snap.cols = board.cols;
-
-    auto sel = controller.getSelected();
-    snap.selectedRow = sel.first;
-    snap.selectedCol = sel.second;
-
-    snap.gameOver = gameOver;
-    snap.winner = winner;
-
-    snap.scoreWhite = score.second;
-    snap.scoreBlack = score.first;
-
-    snap.playerBlack = "black";
-    snap.playerWhite = "white";
-
-    snap.movesLogBlack = movesLogBlack;
-    snap.movesLogWhite = movesLogWhite;
-
-    snap.cells.resize(board.rows, std::vector<CellSnapshot>(board.cols));
-
-    for (int r = 0; r < board.rows; r++)
-    {
-        for (int c = 0; c < board.cols; c++)
-        {
-            Piece* p = board.getPiece(r, c);
-            if (!p)
-                continue;
-
-            snap.cells[r][c] = {
-                p->id,
-                p->type,
-                p->color,
-                arbiter.getStatus(r, c)
-            };
-        }
-    }
-
-    return snap;
+GameSnapshot GameEngine::snapshot() const
+{
+    return snapshotBuilder.build(
+        board,
+        arbiter,
+        controller,
+        gameOver,
+        winner,
+        score,
+        movesLogWhite,
+        movesLogBlack
+    );
 }
 
 std::string GameEngine::cellToNotation(int row, int col)
@@ -185,4 +170,39 @@ std::string GameEngine::cellToNotation(int row, int col)
     int rank = row + 1;
 
     return std::string(1, file) + std::to_string(rank);
+}
+
+void GameEngine::loadBoard(const std::string& path)
+{
+    std::ifstream file(path);
+
+    if (!file.is_open())
+        throw std::runtime_error("Cannot open board file: " + path);
+
+    std::vector<std::string> lines;
+    std::string line;
+
+    while (std::getline(file, line))
+        lines.push_back(line);
+
+    BoardParser parser;
+    std::string error;
+    Board newBoard;
+
+    if (!parser.parse(lines, newBoard, error))
+        throw std::runtime_error(error);
+
+    board = std::move(newBoard);
+
+    score = {0, 0};
+    gameOver = false;
+    winner.clear();
+
+    movesLogWhite.clear();
+    movesLogBlack.clear();
+}
+
+Board& GameEngine::getBoard()
+{
+    return board;
 }

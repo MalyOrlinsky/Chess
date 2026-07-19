@@ -10,9 +10,10 @@
 
 class SpriteLoader {
 public:
-    explicit SpriteLoader(const std::string& basePath) : basePath(basePath) {}
 
-    PieceConfigManager configManager{"assets/pieces2"};
+    explicit SpriteLoader(const std::string& basePath);
+
+    PieceConfigManager configManager;
 
     const std::vector<Img>& getFrames(const std::string& pieceCode,
                                       const PieceStatus& state);

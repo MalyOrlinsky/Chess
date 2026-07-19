@@ -45,3 +45,13 @@ if(WIN32)
         $<$<CONFIG:MinSizeRel>:${OPENCV_LIB_DIR}/opencv_world451.dll>
         $<TARGET_FILE_DIR:${PROJECT_NAME}>)
 endif()
+
+if(MSVC)
+    add_compile_options(/W4)
+else()
+    add_compile_options(
+        -Wall
+        -Wextra
+        -Werror
+    )
+endif()

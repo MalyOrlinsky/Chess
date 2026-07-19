@@ -11,3 +11,7 @@ constexpr char BISHOP_TYPE = 'B';
 constexpr char QUEEN_TYPE  = 'Q';
 constexpr char KNIGHT_TYPE = 'N';
 constexpr char PAWN_TYPE   = 'P';
+
+constexpr int SIDE_PANEL = 200;
+constexpr int TOP_PANEL = 50;
+constexpr int BOTTOM_PANEL = 60;

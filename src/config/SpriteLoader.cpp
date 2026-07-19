@@ -4,6 +4,9 @@
 
 namespace fs = std::filesystem;
 
+SpriteLoader::SpriteLoader(const std::string& basePath) : 
+        basePath(basePath), configManager(basePath) {}
+
 const std::vector<Img>& SpriteLoader::getFrames(const std::string& pieceCode,
                                                   const PieceStatus& state) {
     const std::string key = pieceCode + "/" + PieceStatusToString(state);

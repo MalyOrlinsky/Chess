@@ -8,8 +8,7 @@
 #include <functional>
 #include <string>
 
-using ClickCallback = std::function<void(CellPos)>;
-using WaitCallback  = std::function<void(int ms)>;
+using CommandCallback = std::function<void(const std::string&)>;
 using SnapCallback  = std::function<GameSnapshot()>;
 
 class ImgRenderer {
@@ -18,16 +17,17 @@ public:
                 const std::string& boardImagePath,
                 int rows, int cols);
 
-    void setClickCallback(ClickCallback cb);
-    void setWaitCallback(WaitCallback cb);
+    void setCommandCallback(CommandCallback cb);
     void setSnapCallback(SnapCallback cb);
-    void drawMoveList(Img& canvas, const std::vector<std::string>& moves, int startY, int maxY);
     
     void run();
 
 private:
     void drawPlayers(Img& canvas, const GameSnapshot& snap);
     void drawMoves(Img& canvas, const GameSnapshot& snap);
+    void drawTitle(Img &canvas, const GameSnapshot &snap);
+    
+    void drawMoveList(Img& canvas, const std::vector<std::string>& moves, int startY, int maxY);
 
     static constexpr const char* WINDOW_NAME = "Kung-Fu Chess";
 
@@ -36,15 +36,12 @@ private:
     Img boardImg;
     int rows, cols;
 
-    ClickCallback onClick;
-    WaitCallback onWait;
+    CommandCallback onCommand;
     SnapCallback getSnap;
 
     Img  buildFrame(const GameSnapshot& snap);
     void drawUI(Img& canvas, const GameSnapshot& snap);
     void drawGameOver(Img& canvas, const GameSnapshot& snap);
-
-    CellPos pixelToCell(int x, int y) const;
 
     static void mouseHandler(int event, int x, int y, int flags, void* userdata);
 };

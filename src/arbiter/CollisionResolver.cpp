@@ -1,7 +1,7 @@
 #include "CollisionResolver.hpp"
 #include <iostream>
 
-CollisionResult CollisionResolver::resolve(const Motion& motion, std::vector<Jump> jumps, Board& board) const {
+CollisionResult CollisionResolver::resolve(const Motion& motion, std::vector<Jump>& jumps, Board& board) const {
     if (motion.currentStep + 1 >= static_cast<int>(motion.path.size()))
         return CollisionResult::Finish;
 
@@ -18,7 +18,7 @@ CollisionResult CollisionResolver::resolve(const Motion& motion, std::vector<Jum
     if (target == nullptr)
         return CollisionResult::Continue;
 
-    for (auto j : jumps)
+    for (const auto& j : jumps)
         if (j.row == next.row && j.col == next.col)
             return CollisionResult::Died;
 

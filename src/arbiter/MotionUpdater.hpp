@@ -12,7 +12,7 @@ class MotionUpdater
 {
 public:
 
-    std::vector<Motion> update(std::vector<Motion>& motions, const std::vector<Jump>& jumps,
+    std::vector<Motion> update(std::vector<Motion>& motions, std::vector<Jump>& jumps,
          Board& board, int currentClock, Color& color, std::pair<int, int>& score);
 
 private:

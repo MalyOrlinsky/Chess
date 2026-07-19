@@ -15,15 +15,9 @@ void Board::addRow(std::vector<std::unique_ptr<Piece>> row) {
 void Board::removePiece(int row, int col) {
     grid[row][col].reset();
 }
-
-Piece* Board::movePiece(int fromRow, int fromCol, int toRow, int toCol) {
-    Piece* capturedPiece = nullptr;
-    if (getPiece(toRow, toCol) != nullptr)
-        capturedPiece = getPiece(toRow, toCol);
-
+void Board::movePiece(int fromRow, int fromCol, int toRow, int toCol) {
+        grid[toRow][toCol].reset();
     grid[toRow][toCol] = std::move(grid[fromRow][fromCol]);
-    
-    return capturedPiece;
 }
 
 void Board::promotePiece(int row, int col) {

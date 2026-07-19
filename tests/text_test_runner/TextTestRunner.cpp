@@ -22,8 +22,9 @@ void TextTestRunner::run(std::istream& in) {
     }
 
     GameEngine engine;
+    engine.loadBoard("board.txt");
     std::string error;
-    if (!BoardParser().parse(boardLines, engine.board, error)) {
+    if (!BoardParser().parse(boardLines, engine.getBoard(), error)) {
         std::cout << error << "\n";
         return;
     }

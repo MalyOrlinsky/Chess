@@ -14,5 +14,5 @@ enum class CollisionResult
 class CollisionResolver
 {
 public:
-    CollisionResult resolve(const Motion &motion, std::vector<Jump> jumps, Board &board) const;
+    CollisionResult resolve(const Motion &motion, std::vector<Jump>& jumps, Board &board) const;
 };

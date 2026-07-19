@@ -1,269 +1,380 @@
 # Kung-Fu Chess
 
-A real-time chess engine built with C++17.
+מנוע שחמט בזמן אמת הכתוב ב־C++17.
+
+בניגוד לשחמט קלאסי, כל הכלים נעים בו־זמנית. השחקנים יכולים לבצע פקודות תנועה וקפיצה בכל רגע ללא מערכת תורות.
+
+## תוכן עניינים
+
+* [סקירת ארכיטקטורה](#סקירת-ארכיטקטורה)
+* [מבנה הפרויקט](#מבנה-הפרויקט)
+* [תבניות עיצוב](#תבניות-עיצוב)
+* [עקרונות הנדסת תוכנה](#עקרונות-הנדסת-תוכנה)
+* [אחריות מחלקות](#אחריות-מחלקות)
+* [זרימת ביצוע](#זרימת-ביצוע)
+* [הידור והרצה](#הידור-והרצה)
+* [פורמט קלט](#פורמט-קלט)
+* [מנגנון Jump](#מנגנון-jump)
+* [מגבלות ידועות](#מגבלות-ידועות)
 
 ---
 
-## Architecture
+# סקירת ארכיטקטורה
 
-The project follows these design principles:
+המערכת מחולקת לשכבות עצמאיות. כל שכבה תלויה רק בשכבות שמתחתיה.
 
-- **Single Responsibility Principle** — each class has one clear responsibility.
-- **Separation of Concerns** — rendering, game logic, input, and rules are fully separated.
-- **Strategy Pattern** — each piece movement rule is implemented as a separate class inheriting from `MoveRule`.
-- **Service Layer** — `GameEngine` orchestrates the application flow.
-- **Validation Service** — `RuleEngine` validates all legal moves.
-- **Adapter Pattern** — `BoardMapper` converts pixel coordinates into board positions.
-- **DTO / Read-only View Model** — `GameSnapshot` and `CellSnapshot` provide immutable data for rendering.
-- **Builder Pattern** — `BoardBuilder` constructs a `Board` from a string input.
+```
+main.cpp
+    |
+ImgRenderer
+    |
+GameEngine
+    |
++----------------+
+| RuleEngine     |
+| RealTimeArbiter|
++----------------+
+    |
+controllerClick / BoardMapper
+    |
+Board / Piece
+    |
+movement / config / text_io
+```
+
+## שכבות המערכת
+
+### Model
+
+מכיל את מודל המשחק:
+
+* Board
+* Piece
+
+ללא חוקי משחק וללא תלות בתצוגה.
+
+### Movement
+
+מכיל חוקי תנועה לכל סוג כלי.
+
+### Rule Engine
+
+אחראי על בדיקת חוקיות:
+
+* גבולות לוח
+* צבעים
+* חוקי תנועה
+* מסלולים פנויים
+
+### Arbiter
+
+מנהל תנועות בזמן אמת:
+
+* Motion
+* Collision
+* Jump
+* Tick updates
+
+### Game Engine
+
+שכבת תיאום בין רכיבי המשחק.
+
+### Renderer
+
+מציג את המשחק באמצעות OpenCV.
 
 ---
 
-## Project Structure
+# מבנה הפרויקט
 
-```text
+```
 Chess/
+├── main.cpp
+├── board.txt
+├── CMakeLists.txt
+│
 ├── src/
-│   ├── Constants.hpp               # Global constants
-│   │
+│   ├── Constants.hpp
+│
 │   ├── model/
-│   │   ├── Piece.hpp / .cpp
-│   │   └── Board.hpp / .cpp        # grid: vector<vector<unique_ptr<Piece>>>
-│   │
+│   │   ├── Piece.hpp
+│   │   └── Board.hpp
+│
 │   ├── movement/
 │   │   ├── MoveRule.hpp
-│   │   ├── RookRule.hpp / .cpp
-│   │   ├── BishopRule.hpp / .cpp
-│   │   ├── QueenRule.hpp / .cpp
-│   │   ├── KnightRule.hpp / .cpp
-│   │   ├── KingRule.hpp / .cpp
-│   │   └── PawnRule.hpp / .cpp
-│   │
+│   │   ├── RookRule
+│   │   ├── BishopRule
+│   │   ├── QueenRule
+│   │   ├── KnightRule
+│   │   ├── KingRule
+│   │   ├── PawnRule
+│   │   └── PathBuilder
+│
 │   ├── rule_engine/
 │   │   ├── RuleResult.hpp
-│   │   └── RuleEngine.hpp / .cpp
-│   │
-│   ├── arbiter/
-│   │   ├── Motion.hpp
-│   │   └── RealTimeArbiter.hpp
-│   │
-│   ├── controllerClick/
-│   │   ├── CellPos.hpp
-│   │   ├── ClickResult.hpp
-│   │   ├── BoardMapper.hpp / .cpp
-│   │   └── controllerClick.hpp / .cpp
-│   │
-│   ├── game_engine/
-│   │   └── GameEngine.hpp / .cpp
-│   │
-│   ├── renderer/
-│   │   ├── GameSnapshot.hpp
-│   │   └── Renderer.hpp
-│   │
-│   └── text_io/
-│       ├── PieceFactory.hpp / .cpp
-│       ├── BoardBuilder.hpp / .cpp  # builds Board from string
-│       ├── BoardParser.hpp / .cpp   # wrapper over BoardBuilder
-│       └── BoardPrinter.hpp / .cpp
+│   │   └── RuleEngine
 │
-└── tests/
-    ├── text_test_runner/
-    │   ├── CommandType.hpp
-    │   └── TextTestRunner.hpp / .cpp
-    ├── test_new.cpp
-    └── main.cpp
+│   ├── arbiter/
+│   │   ├── Motion
+│   │   ├── RealTimeArbiter
+│   │   ├── MotionUpdater
+│   │   ├── MotionAdvancer
+│   │   └── CollisionResolver
+│
+│   ├── controllerClick/
+│   ├── game_engine/
+│   ├── renderer/
+│   ├── config/
+│   └── text_io/
+│
+├── tests/
+└── assets/
 ```
 
 ---
 
-## Build & Run
+# תבניות עיצוב
 
-### Compile main
+## Strategy Pattern
 
-```bash
-g++ -std=c++17 -I src \
-  main.cpp \
-  tests/text_test_runner/TextTestRunner.cpp \
-  src/game_engine/GameEngine.cpp \
-  src/arbiter/RealTimeArbiter.cpp \
-  src/model/Board.cpp \
-  src/model/Piece.cpp \
-  src/rule_engine/RuleEngine.cpp \
-  src/controllerClick/controllerClick.cpp \
-  src/controllerClick/BoardMapper.cpp \
-  src/text_io/BoardParser.cpp \
-  src/text_io/BoardBuilder.cpp \
-  src/text_io/BoardPrinter.cpp \
-  src/text_io/PieceFactory.cpp \
-  src/movement/RookRule.cpp \
-  src/movement/BishopRule.cpp \
-  src/movement/QueenRule.cpp \
-  src/movement/KnightRule.cpp \
-  src/movement/KingRule.cpp \
-  src/movement/PawnRule.cpp \
-  -o chess && ./chess
+כל כלי משתמש במחלקת תנועה משלו:
+
+```
+MoveRule
+   |
+   +-- RookRule
+   +-- BishopRule
+   +-- QueenRule
+   +-- KnightRule
+   +-- KingRule
+   +-- PawnRule
 ```
 
-### Run
+הוספת כלי חדש אינה דורשת שינוי ב־RuleEngine.
 
-```bash
-./chess_gui.exe board.txt
+---
+
+## Adapter Pattern
+
+BoardMapper ממיר:
+
+```
+Pixel Coordinate
+        |
+        v
+Cell Position
 ```
 
-### Run Compile tests
+כך שכבת התצוגה מופרדת מחוקי המשחק.
+
+---
+
+## DTO Pattern
+
+Renderer עובד מול:
+
+* GameSnapshot
+* CellSnapshot
+
+ואינו ניגש ישירות ל־Board או Piece.
+
+---
+
+## Builder Pattern
+
+BoardBuilder אחראי ליצירת Board מתוך קובץ טקסט.
+
+---
+
+## Factory Pattern
+
+PieceFactory יוצר כלים:
+
+```
+wK
+bQ
+wP
+```
+
+ומחזיר אובייקט מתאים.
+
+---
+
+## Observer / Callback
+
+RealTimeArbiter מפעיל Callback כאשר מלך נתפס.
+
+GameEngine משתמש באירוע כדי לעדכן סיום משחק.
+
+---
+
+# עקרונות הנדסת תוכנה
+
+## Single Responsibility Principle
+
+אחריות מרכזית:
+
+| מחלקה           | אחריות            |
+| --------------- | ----------------- |
+| Board           | אחסון מצב הלוח    |
+| Piece           | מודל כלי          |
+| RuleEngine      | בדיקת חוקיות      |
+| MoveRule        | חוקי תנועה        |
+| RealTimeArbiter | ניהול זמן ותנועות |
+| BoardMapper     | המרת קואורדינטות  |
+| Renderer        | ציור              |
+
+---
+
+# אחריות מחלקות
+
+| מחלקה             | אחריות                |
+| ----------------- | --------------------- |
+| GameEngine        | תיאום בין רכיבי המשחק |
+| Board             | ניהול לוח             |
+| Piece             | מחלקת בסיס לכלים      |
+| RuleEngine        | ולידציה               |
+| RealTimeArbiter   | ניהול תנועות          |
+| MotionUpdater     | עדכון Tick            |
+| CollisionResolver | טיפול בהתנגשויות      |
+| BoardBuilder      | בניית לוח             |
+| PieceFactory      | יצירת כלים            |
+| SpriteLoader      | טעינת נכסים           |
+| GameSnapshot      | DTO לתצוגה            |
+
+---
+
+# זרימת ביצוע
+
+## מצב GUI
+
+```
+main.cpp
+ |
+טעינת board.txt
+ |
+BoardParser
+ |
+BoardBuilder
+ |
+PieceFactory
+ |
+Board
+ |
+GameEngine
+ |
+ImgRenderer
+ |
+Game Loop
+```
+
+בכל Frame:
+
+1. עדכון זמן
+2. עדכון תנועות
+3. טיפול בקלט
+4. יצירת Snapshot
+5. ציור
+
+---
+
+# הידור והרצה
+
+## דרישות
+
+* C++17
+* CMake 3.16+
+* OpenCV 4.5.1
+
+## בנייה
+
 ```bash
-g++ -std=c++17 -I src \
-    tests/test_new.cpp \
-    tests/text_test_runner/TextTestRunner.cpp \
-    src/game_engine/GameEngine.cpp \
-    src/arbiter/RealTimeArbiter.cpp \
-    src/model/Board.cpp \
-    src/model/Piece.cpp \
-    src/rule_engine/RuleEngine.cpp \
-    src/controllerClick/controllerClick.cpp \
-    src/controllerClick/BoardMapper.cpp \
-    src/text_io/BoardParser.cpp \
-    src/text_io/BoardBuilder.cpp \
-    src/text_io/BoardPrinter.cpp \
-    src/text_io/PieceFactory.cpp \
-    src/movement/RookRule.cpp \
-    src/movement/BishopRule.cpp \
-    src/movement/QueenRule.cpp \
-    src/movement/KnightRule.cpp \
-    src/movement/KingRule.cpp \
-    src/movement/PawnRule.cpp \
-    -o chess_test && ./chess_test
+cmake -S . -B build
+cmake --build build --config Release
+```
+
+## הרצה
+
+Windows:
+
+```bash
+build/Release/KungFuChess.exe
+```
+
+Linux/macOS:
+
+```bash
+build/KungFuChess
 ```
 
 ---
 
-## Input Format
+# פורמט קלט
 
-```text
-Board:
+## לוח
+
+```
 wR wN wB wQ wK wB wN wR
 wP wP wP wP wP wP wP wP
 . . . . . . . .
-. . . . . . . .
-. . . . . . . .
-. . . . . . . .
-bP bP bP bP bP bP bP bP
-bR bN bB bQ bK bB bN bR
+```
 
-Commands:
-click 50 50
-click 50 150
-wait 1000
+`.` מייצג תא ריק.
+
+---
+
+## פקודות
+
+```
+click X Y
+jump X Y
+wait MS
 print board
 ```
 
 ---
 
-## Commands
+# סימוני כלים
 
-| Command | Description |
-|----------|-------------|
-| `click X Y` | Click at pixel position `(X, Y)` |
-| `jump X Y` | Make the selected piece jump for 1000 ms |
-| `wait MS` | Advance the game clock by `MS` milliseconds |
-| `print board` | Print the current board |
-
----
-
-## Jump Mechanic
-
-A jump makes a piece **airborne** for **1000 ms** (`JUMP_DURATION`).
-
-While airborne, the piece remains on its square and can capture any opposing piece that reaches that square during the jump interval.
-
-Rules:
-
-- A moving piece cannot jump.
-- A piece that is already jumping cannot jump again.
-- A moving piece that reaches the square of a jumping enemy is captured.
-- Clicking the currently selected square again triggers a jump (if allowed).
+| סימון | כלי    |
+| ----- | ------ |
+| K     | King   |
+| Q     | Queen  |
+| R     | Rook   |
+| B     | Bishop |
+| N     | Knight |
+| P     | Pawn   |
 
 ---
 
-## Piece Tokens
+# מנגנון Jump
 
-| Token | Piece |
-|--------|-------|
-| `wK` / `bK` | White / Black King |
-| `wQ` / `bQ` | White / Black Queen |
-| `wR` / `bR` | White / Black Rook |
-| `wB` / `bB` | White / Black Bishop |
-| `wN` / `bN` | White / Black Knight |
-| `wP` / `bP` | White / Black Pawn |
+כאשר כלי מבצע Jump:
 
----
-
-# עברית
-
-מנוע שחמט בזמן אמת הכתוב ב־C++17.
+* הכלי נשאר במשבצת המקור.
+* ניתן ללכוד כלי אויב שנכנס למשבצת בזמן הקפיצה.
+* כלי בתנועה אינו יכול לבצע Jump.
+* כלי שכבר נמצא במצב Jump אינו מתחיל Jump נוסף.
+* לחיצה נוספת על כלי Idle מפעילה Jump.
 
 ---
 
-## ארכיטקטורה
+# מגבלות ידועות
 
-הפרויקט מבוסס על העקרונות הבאים:
+| רכיב              | בעיה                           |
+| ----------------- | ------------------------------ |
+| GameEngine        | board ו־mapper ציבוריים        |
+| GameEngine        | snapshot() אינו באחריותו       |
+| GameEngine        | cellToNotation() אינו באחריותו |
+| Assets            | נתיב כפול בקוד                 |
+| SpriteLoader      | נתיב Config קשיח               |
+| MotionUpdater     | קוד מת                         |
+| CollisionResolver | העברת vector לפי ערך           |
+| Board::movePiece  | אפשרות dangling pointer        |
+| RookRule          | משתנים לא בשימוש               |
+| PieceFactory      | מיקום מחלקות לא מתאים          |
+| Renderer          | קבועים כפולים                  |
+| ImgRenderer       | drawMoveList ציבורית ללא צורך  |
 
-- **Single Responsibility Principle** – לכל מחלקה אחריות אחת בלבד.
-- **Separation of Concerns** – הפרדה מלאה בין לוגיקת המשחק, הקלט, החוקים והרינדור.
-- **Strategy Pattern** – חוקי התנועה של כל כלי ממומשים במחלקה נפרדת היורשת מ־`MoveRule`.
-- **Service Layer** – המחלקה `GameEngine` מרכזת ומנהלת את זרימת המשחק.
-- **Validation Service** – המחלקה `RuleEngine` אחראית על בדיקת חוקיות המהלכים.
-- **Adapter Pattern** – המחלקה `BoardMapper` ממירה קואורדינטות פיקסלים למיקומים על הלוח.
-- **DTO / Read-only View Model** – המחלקות `GameSnapshot` ו־`CellSnapshot` מספקות נתונים לקריאה בלבד עבור שכבת התצוגה.
-
----
-
-## מבנה הפרויקט, הידור והרצה
-
-מבנה התיקיות, הידור והרצה מתואר למעלה בגרסה האנגלית.
-
----
-
-## פורמט הקלט
-
-תחילה מופיע הלוח (8×8), ולאחריו רשימת הפקודות לביצוע.
-
-דוגמה מופיעה בגרסה האנגלית.
-
----
-
-## הפקודות
-
-| פקודה | הסבר |
-|--------|------|
-| `click X Y` | לחיצה על מיקום הפיקסלים `(X,Y)` |
-| `jump X Y` | ביצוע קפיצה של הכלי הנבחר למשך 1000 אלפיות שנייה |
-| `wait MS` | קידום שעון המשחק במספר אלפיות השנייה המבוקש |
-| `print board` | הדפסת מצב הלוח הנוכחי |
-
----
-
-## מנגנון הקפיצה
-
-בעת קפיצה הכלי נמצא במצב **Airborne** למשך **1000ms**.
-
-במהלך זמן זה:
-
-- הכלי נשאר באותו תא.
-- ניתן לבצע קפיצה רק אם הכלי אינו בתנועה.
-- לא ניתן להתחיל קפיצה נוספת כאשר הכלי כבר קופץ.
-- כלי שמגיע לתא של כלי קופץ במהלך חלון הזמן נתפס.
-- לחיצה נוספת על אותו תא מפעילה קפיצה כאשר הדבר חוקי.
-
----
-
-## סימוני הכלים
-
-| סימון | כלי |
-|--------|-----|
-| `wK` / `bK` | מלך לבן / שחור |
-| `wQ` / `bQ` | מלכה לבנה / שחורה |
-| `wR` / `bR` | צריח לבן / שחור |
-| `wB` / `bB` | רץ לבן / שחור |
-| `wN` / `bN` | פרש לבן / שחור |
-| `wP` / `bP` | רגלי לבן / שחור |
+```
+```

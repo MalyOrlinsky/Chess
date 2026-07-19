@@ -83,12 +83,6 @@
 #include "AnimatorPool.hpp"
 #include "../Constants.hpp"
 
-namespace
-{
-    constexpr int SIDE_PANEL = 180;
-    constexpr int TOP_PANEL = 60;
-}
-
 AnimatorPool::AnimatorPool(SpriteLoader &loader)
     : loader(loader)
 {
