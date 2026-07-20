@@ -1,11 +1,27 @@
-// #include "NetworkServer.hpp"
+#include "GameEngine.hpp"
+#include "NetworkServer.hpp"
 
 
-// int main()
-// {
-//     NetworkServer server(9000);
+int main()
+{
+    NetworkServer server(8080);
 
-//     server.start();
+    GameEngine engine;
 
-//     return 0;
-// }
+    engine.loadBoard("board.txt");
+
+
+    server.start();
+
+
+    while(true)
+    {
+        engine.update();
+
+        auto snapshot = engine.snapshot();
+
+        server.broadcast(snapshot);
+    }
+
+    return 0;
+}

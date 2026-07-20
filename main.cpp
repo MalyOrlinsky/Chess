@@ -1,8 +1,9 @@
 #include "src/game_engine/GameEngine.hpp"
 #include "src/renderer/ImgRenderer.hpp"
 #include "server/NetworkServer.hpp"
+#include "src/network/NetworkClient.hpp"
 #include "src/commands/CommandExecutor.hpp"
-
+#include <thread>
 #include <iostream>
 
 int main()
@@ -22,12 +23,29 @@ int main()
         CommandExecutor executor(engine);
 
         NetworkServer server(8080, executor);
-        server.start();
+
+        std::thread serverThread(
+            [&]()
+            {
+                server.start();
+            });
+
+        // renderer.setCommandCallback(
+        //     [&](const std::string &cmd)
+        //     {
+        //         executor.execute(cmd);
+        //     });
+
+        NetworkClient client;
+
+        client.connect(
+            "localhost",
+            8080);
 
         renderer.setCommandCallback(
             [&](const std::string &cmd)
             {
-                executor.execute(cmd);
+                client.sendCommand(cmd);
             });
 
         renderer.setSnapCallback(
