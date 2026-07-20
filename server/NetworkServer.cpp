@@ -2,14 +2,12 @@
 
 #include <iostream>
 
-
 NetworkServer::NetworkServer(int port)
     :
     port(port),
     websocketServer(port)
 {
 }
-
 
 void NetworkServer::start()
 {

@@ -52,3 +52,4 @@ cpp/OpenCV_451/
 Thumbs.db
 .DS_Store
 
+/external/websocketpp/
