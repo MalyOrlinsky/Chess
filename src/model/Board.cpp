@@ -16,7 +16,7 @@ void Board::removePiece(int row, int col) {
     grid[row][col].reset();
 }
 void Board::movePiece(int fromRow, int fromCol, int toRow, int toCol) {
-        grid[toRow][toCol].reset();
+    grid[toRow][toCol].reset();
     grid[toRow][toCol] = std::move(grid[fromRow][fromCol]);
 }
 

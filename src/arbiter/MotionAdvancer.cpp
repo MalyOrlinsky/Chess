@@ -1,4 +1,5 @@
 #include "MotionAdvancer.hpp"
+#include "iostream"
 
 std::pair<int, int> MotionAdvancer::advance(Motion &motion, std::vector<Motion> &motions, const std::vector<Jump> &jumps,
                              Board &board, int currentClock, Color &color) const
@@ -10,13 +11,10 @@ std::pair<int, int> MotionAdvancer::advance(Motion &motion, std::vector<Motion> 
     const Position &current = motion.path[motion.currentStep];
     const Position &next = motion.path[motion.currentStep + 1];
 
-    const Piece *piece = board.getPiece(next.row, next.col);
+    Piece *piece = board.getPiece(next.row, next.col);
     if (piece)
     {
-        (piece->color == Color::White ? score.first : score.second) += piece->score;
-
-        if (piece->type == KING_TYPE)
-            color = piece->color == Color::White ? Color::White : Color::Black;
+        SoundEffects::playCapture(piece, score, color, board, next.row, next.col);
 
         for (auto &m : motions)
         {
@@ -28,11 +26,8 @@ std::pair<int, int> MotionAdvancer::advance(Motion &motion, std::vector<Motion> 
         }
     }
 
-    board.movePiece(current.row, current.col, next.row, next.col);
-
-    int lastRow = board.getPiece(next.row, next.col)->color == Color::White ? 0 : board.rows - 1;
-    if (next.row == lastRow)
-        board.promotePiece(next.row, next.col);
+    int lastRow = board.getPiece(current.row, current.col)->color == Color::White ? 0 : board.rows - 1;
+    SoundEffects::playMove(board, current, next, lastRow);
 
     ++motion.currentStep;
 
@@ -45,12 +40,7 @@ std::pair<int, int> MotionAdvancer::died(Motion &motion, Board &board, Color &co
 
     auto piece = board.getPiece(motion.path[motion.currentStep].row, motion.path[motion.currentStep].col);
     if (piece)
-    {
-        if (piece->type == KING_TYPE)
-            color = board.getPiece(motion.path[motion.currentStep].row, motion.path[motion.currentStep].col)->color == Color::White ? Color::White : Color::Black;
-        (piece->color == Color::White ? score.first : score.second) += piece->score;
-    }
-    board.removePiece(motion.path[motion.currentStep].row, motion.path[motion.currentStep].col);
+        SoundEffects::playCapture(piece, score, color, board, motion.path[motion.currentStep].row, motion.path[motion.currentStep].col);
 
     return score;
 }

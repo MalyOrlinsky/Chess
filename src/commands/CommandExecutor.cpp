@@ -17,7 +17,8 @@ std::pair<int,int> CommandExecutor::parseXY(const std::string& s) {
     return {x, y};
 }
 
-void CommandExecutor::execute(const std::string& cmd) {
+void CommandExecutor::execute(const std::string& cmd, Color playerColor) {
+    std::cout << cmd << std::endl;
     switch (parseCommandType(cmd)) {
         case CommandType::PrintBoard:
             engine.handleWait(0);
@@ -28,7 +29,7 @@ void CommandExecutor::execute(const std::string& cmd) {
             auto [x, y] = parseXY(cmd.substr(6));
             CellPos pos = mapper.toCell(x, y, engine.rows(), engine.cols(), 
                                         engine.cols() * CELL_SIZE_PX, engine.rows() * CELL_SIZE_PX);
-            engine.handleClick(pos);
+            engine.handleClick(pos, playerColor);
             break;
         }
         case CommandType::Jump: {
@@ -36,7 +37,7 @@ void CommandExecutor::execute(const std::string& cmd) {
             auto [x, y] = parseXY(cmd.substr(5));
             CellPos pos = mapper.toCell(x, y, engine.rows(), engine.cols(), 
                                         engine.cols() * CELL_SIZE_PX, engine.rows() * CELL_SIZE_PX);
-            engine.requestJump(pos);
+            engine.requestJump(pos, playerColor);
             break;
         }
         case CommandType::Wait: {

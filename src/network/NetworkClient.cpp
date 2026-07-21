@@ -22,29 +22,33 @@ NetworkClient::NetworkClient()
                 << "WebSocket client connected"
                 << std::endl;
         });
-
     client.set_message_handler(
-        [&](websocketpp::connection_hdl,
-            Client::message_ptr msg)
+        [&](websocketpp::connection_hdl, Client::message_ptr msg)
         {
-            std::cout
-                << "CLIENT RECEIVED LENGTH: "
-                << msg->get_payload().size()
-                << std::endl;
+            try
+            {
+                auto message = Network::Serializer::deserialize(msg->get_payload());
 
-            std::cout
-                << "CLIENT RECEIVED:"
-                << msg->get_payload()
-                << std::endl;
+                switch (message.type)
+                {
+                case Network::MessageType::Snapshot:
+                    handleSnapshot(message.payload);
+                    break;
 
-            latestSnapshot = Network::Serializer::deserializeSnapshot(msg->get_payload());
-
-            std::cout
-                << "CLIENT SNAPSHOT: "
-                << latestSnapshot.rows
-                << " "
-                << latestSnapshot.cols
-                << std::endl;
+                case Network::MessageType::PlayerInfo:
+                    handlePlayerInfo(message);
+                    break;
+                default:
+                    break;
+                }
+            }
+            catch (const std::exception &e)
+            {
+                std::cout
+                    << "CLIENT ERROR: "
+                    << e.what()
+                    << std::endl;
+            }
         });
 }
 
@@ -94,4 +98,24 @@ void NetworkClient::sendCommand(const std::string &command)
 GameSnapshot NetworkClient::getLatestSnapshot()
 {
     return latestSnapshot;
+}
+
+Color NetworkClient::getMyColor() const
+{
+    return myColor;
+}
+
+void NetworkClient::handleSnapshot(const std::string &data)
+{
+    latestSnapshot = Network::Serializer::deserializeSnapshot(data);
+}
+
+void NetworkClient::handlePlayerInfo(const Network::Message &message)
+{
+    if (message.payload == "white")
+        myColor = Color::White;
+    else if (message.payload == "black")
+        myColor = Color::Black;
+    else
+        myColor = Color::None;
 }

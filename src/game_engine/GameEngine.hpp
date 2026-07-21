@@ -12,7 +12,9 @@
 #include <vector>
 #include "../text_io/BoardParser.hpp"
 #include <fstream>
+#include <iostream>
 #include "SnapshotBuilder.hpp"
+#include "../buffer/SoundEffects.hpp"
 
 class GameEngine
 {
@@ -26,11 +28,10 @@ public:
 
     GameEngine();
 
-    void handleClick(CellPos pos);
+    void handleClick(CellPos pos, Color color);
     void requestMove(CellPos from, CellPos to);
-    void requestJump(CellPos pos);
+    void requestJump(CellPos pos, Color playerColor);
     void handleWait(int ms);
-    // void execute(const std::string& cmd);
     int clock() const;
     GameSnapshot snapshot() const;
 

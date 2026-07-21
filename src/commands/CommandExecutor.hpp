@@ -9,7 +9,7 @@ class CommandExecutor
 public:
     explicit CommandExecutor(GameEngine &engine);
 
-    void execute(const std::string &command);
+    void execute(const std::string &command, Color playerColor);
 
 private:
     CommandType parseCommandType(const std::string &cmd);

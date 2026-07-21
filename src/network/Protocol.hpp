@@ -10,7 +10,8 @@ namespace Network
         Play,
         Snapshot,
         Text,
-        Error
+        Error,
+        PlayerInfo
     };
 
 }

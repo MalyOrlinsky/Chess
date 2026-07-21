@@ -4,6 +4,7 @@
 #include "../arbiter/Motion.hpp"
 #include <vector>
 #include <string>
+#include <map>
 
 struct CellSnapshot {
     int id = -1;
@@ -17,8 +18,8 @@ struct GameSnapshot {
     std::vector<std::vector<CellSnapshot>> cells;
     bool gameOver = false;
     std::string winner;
-    int selectedRow = -1;
-    int selectedCol = -1;
+    
+    std::map<Color, std::pair<int, int>> selected;
 
     std::vector<Motion> motions;
 

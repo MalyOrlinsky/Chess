@@ -15,11 +15,7 @@ int main()
 
         // engine.loadBoard("board.txt");
 
-        ImgRenderer renderer(
-            "assets/pieces2",
-            "assets/board.png",
-            ROW,
-            COL);
+        ImgRenderer renderer("assets/pieces2", "assets/board.png", ROW, COL);
 
         // CommandExecutor executor(engine);
 
@@ -59,6 +55,12 @@ int main()
             [&]()
             {
                 return client.getLatestSnapshot();
+            });
+
+        renderer.setColorCallback(
+            [&]()
+            {
+                return client.getMyColor();
             });
 
         renderer.run();

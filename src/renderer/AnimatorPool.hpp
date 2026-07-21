@@ -2,7 +2,7 @@
 #include "SpriteAnimator.hpp"
 #include "../config/SpriteLoader.hpp"
 #include "../game_engine/GameSnapshot.hpp"
-#include "../../cpp/src/img.hpp"
+#include "../../img/src/img.hpp"
 #include <map>
 #include <string>
 
@@ -12,7 +12,7 @@ public:
 
     void update(const GameSnapshot& snap, int dt);
 
-    void drawAll(Img& canvas, const GameSnapshot& snap);
+    void drawAll(Img& canvas, const GameSnapshot& snap, Color color);
 
 private:
     SpriteLoader& loader;

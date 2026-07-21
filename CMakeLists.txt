@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # OpenCV
 # =====================
 
-set(OPENCV_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cpp/OpenCV_451")
+set(OPENCV_DIR "${CMAKE_CURRENT_SOURCE_DIR}/img/OpenCV_451")
 set(OPENCV_INCLUDE_DIR "${OPENCV_DIR}/include")
 set(OPENCV_LIB_DIR "${OPENCV_DIR}/bin")
 
@@ -37,7 +37,7 @@ file(GLOB_RECURSE CLIENT_SOURCES
     "src/renderer/*.cpp"
     "src/controllerClick/*.cpp"
     "src/network/*.cpp"
-    "cpp/src/img.cpp"
+    "img/src/img.cpp"
     "src/config/SpriteLoader.cpp"
 )
 
@@ -45,7 +45,7 @@ file(GLOB_RECURSE CLIENT_HEADERS
     "src/renderer/*.hpp"
     "src/controllerClick/*.hpp"
     "src/network/*.hpp"
-    "cpp/src/img.hpp"
+    "img/src/img.hpp"
     "src/config/SpriteLoader.hpp"
 )
 
@@ -54,6 +54,9 @@ file(GLOB_RECURSE CLIENT_HEADERS
 # =====================
 
 file(GLOB_RECURSE SERVER_SOURCES
+    "audio/*.cpp"
+    "audios/*.cpp"
+    "src/buffer/*.cpp"
     "src/model/*.cpp"
     "src/movement/*.cpp"
     "src/rule_engine/*.cpp"
@@ -68,6 +71,9 @@ file(GLOB_RECURSE SERVER_SOURCES
 )
 
 file(GLOB_RECURSE SERVER_GAME_HEADERS
+    "audio/*.hpp"
+    "audios/*.hpp"
+    "src/buffer/*.hpp"
     "src/model/*.hpp"
     "src/movement/*.hpp"
     "src/rule_engine/*.hpp"
@@ -105,7 +111,7 @@ target_include_directories(KungFuChessClient PRIVATE
     # opencv
     "${OPENCV_INCLUDE_DIR}"
     # project
-    "${CMAKE_CURRENT_SOURCE_DIR}/cpp/src"
+    "${CMAKE_CURRENT_SOURCE_DIR}/img/src"
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
 )
 
@@ -144,7 +150,7 @@ target_include_directories(KungFuChessServer PRIVATE
     # asio
     "${CMAKE_CURRENT_SOURCE_DIR}/external/asio/asio/include"
     # project
-    "${CMAKE_CURRENT_SOURCE_DIR}/cpp/src"
+    "${CMAKE_CURRENT_SOURCE_DIR}/img/src"
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
 )
 

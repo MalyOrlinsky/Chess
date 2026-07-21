@@ -17,10 +17,11 @@ GameSnapshot SnapshotBuilder::build(
     snap.rows = board.rows;
     snap.cols = board.cols;
 
-    auto selected = controller.getSelected();
+    auto selectedBlack = controller.getSelected(Color::Black);
+    auto selectedWhite = controller.getSelected(Color::White);
 
-    snap.selectedRow = selected.first;
-    snap.selectedCol = selected.second;
+    snap.selected[Color::Black] = selectedBlack;
+    snap.selected[Color::White] = selectedWhite;
 
     snap.gameOver = gameOver;
     snap.winner = winner;

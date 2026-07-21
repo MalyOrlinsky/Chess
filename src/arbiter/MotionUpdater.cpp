@@ -33,7 +33,7 @@ std::vector<Motion> MotionUpdater::update(std::vector<Motion>& motions, std::vec
             motion.valid = false;
             continue;
         }
-
+std::cout << "MotionUpdater";
         std::pair<int, int> scoreTemp = advancer.advance(motion, motions, jumps, board, currentClock, color);
         score.first += scoreTemp.first;
         score.second += scoreTemp.second;

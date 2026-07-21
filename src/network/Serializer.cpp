@@ -27,6 +27,9 @@ namespace Network
 
         case MessageType::Error:
             return "Error";
+
+        case MessageType::PlayerInfo:
+            return "PlayerInfo";
         }
 
         return "Unknown";
@@ -51,6 +54,9 @@ namespace Network
 
         if (type == "Error")
             return MessageType::Error;
+
+        if (type == "PlayerInfo")
+            return MessageType::PlayerInfo;
 
         throw std::runtime_error("Unknown message type");
     }
@@ -86,8 +92,14 @@ namespace Network
         json["gameOver"] = snapshot.gameOver;
         json["winner"] = snapshot.winner;
 
-        json["selectedRow"] = snapshot.selectedRow;
-        json["selectedCol"] = snapshot.selectedCol;
+        json["selected"] = nlohmann::json::array();
+
+        for (const auto &[color, pos] : snapshot.selected)
+        {
+            json["selected"].push_back({{"color", static_cast<int>(color)},
+                                        {"row", pos.first},
+                                        {"col", pos.second}});
+        }
 
         json["playerWhite"] = snapshot.playerWhite;
         json["playerBlack"] = snapshot.playerBlack;
@@ -98,7 +110,6 @@ namespace Network
         json["movesLogWhite"] = snapshot.movesLogWhite;
         json["movesLogBlack"] = snapshot.movesLogBlack;
 
-        // cells
         for (const auto &row : snapshot.cells)
         {
             nlohmann::json jsonRow;
@@ -129,20 +140,39 @@ namespace Network
         snapshot.gameOver = json.at("gameOver").get<bool>();
         snapshot.winner = json.at("winner").get<std::string>();
 
-        snapshot.selectedRow = json.at("selectedRow").get<int>();
-        snapshot.selectedCol = json.at("selectedCol").get<int>();
+        if (json.contains("selected"))
+        {
+            for (const auto &item : json["selected"])
+            {
+                Color color =
+                    static_cast<Color>(item.at("color").get<int>());
 
-        snapshot.playerWhite = json.at("playerWhite").get<std::string>();
-        snapshot.playerBlack = json.at("playerBlack").get<std::string>();
+                int row = item.at("row").get<int>();
+                int col = item.at("col").get<int>();
 
-        snapshot.scoreWhite = json.at("scoreWhite").get<int>();
-        snapshot.scoreBlack = json.at("scoreBlack").get<int>();
+                snapshot.selected[color] = {row, col};
+            }
+        }
+
+        snapshot.playerWhite =
+            json.at("playerWhite").get<std::string>();
+
+        snapshot.playerBlack =
+            json.at("playerBlack").get<std::string>();
+
+        snapshot.scoreWhite =
+            json.at("scoreWhite").get<int>();
+
+        snapshot.scoreBlack =
+            json.at("scoreBlack").get<int>();
 
         snapshot.movesLogWhite =
-            json.at("movesLogWhite").get<std::vector<std::string>>();
+            json.at("movesLogWhite")
+                .get<std::vector<std::string>>();
 
         snapshot.movesLogBlack =
-            json.at("movesLogBlack").get<std::vector<std::string>>();
+            json.at("movesLogBlack")
+                .get<std::vector<std::string>>();
 
         snapshot.cells.resize(snapshot.rows);
 
@@ -158,14 +188,19 @@ namespace Network
 
                 CellSnapshot cell;
 
-                cell.id = jCell.at("id").get<int>();
-                cell.type = jCell.at("type").get<char>();
+                cell.id =
+                    jCell.at("id").get<int>();
+
+                cell.type =
+                    jCell.at("type").get<char>();
 
                 cell.color =
-                    static_cast<Color>(jCell.at("color").get<int>());
+                    static_cast<Color>(
+                        jCell.at("color").get<int>());
 
                 cell.status =
-                    static_cast<PieceStatus>(jCell.at("status").get<int>());
+                    static_cast<PieceStatus>(
+                        jCell.at("status").get<int>());
 
                 snapshot.cells[r][c] = cell;
             }

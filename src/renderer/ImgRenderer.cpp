@@ -20,6 +20,11 @@ void ImgRenderer::setSnapCallback(SnapCallback cb)
     getSnap = cb;
 }
 
+void ImgRenderer::setMyColor(Color color)
+{
+    myColor = color;
+}
+
 void ImgRenderer::run()
 {
     Img::create_window(WINDOW_NAME);
@@ -30,13 +35,11 @@ void ImgRenderer::run()
     while (Img::is_window_open(WINDOW_NAME))
     {
         auto now = std::chrono::steady_clock::now();
-
         int dt = (int)std::chrono::duration_cast<std::chrono::milliseconds>(now - prev).count();
-
         prev = now;
 
         if (onCommand)
-            onCommand("wait " + std::to_string(dt));
+            onCommand("wait 0");
 
         GameSnapshot snap = getSnap ? getSnap() : GameSnapshot{};
 
@@ -71,7 +74,13 @@ Img ImgRenderer::buildFrame(const GameSnapshot &snap)
     boardImg.draw_on(canvas, SIDE_PANEL, TOP_PANEL);
 
     drawTitle(canvas, snap);
-    pool.drawAll(canvas, snap);
+
+    myColor = Color::None;
+
+    if (colorCallback)
+        myColor = colorCallback();
+
+    pool.drawAll(canvas, snap, myColor);
     drawUI(canvas, snap);
 
     if (snap.gameOver)
@@ -154,4 +163,9 @@ void ImgRenderer::mouseHandler(int event, int x, int y, int, void *userdata)
     auto *self = static_cast<ImgRenderer *>(userdata);
     if (self->onCommand)
         self->onCommand("click " + std::to_string(x) + " " + std::to_string(y));
+}
+
+void ImgRenderer::setColorCallback(std::function<Color()> cb)
+{
+    colorCallback = std::move(cb);
 }

@@ -3,26 +3,13 @@
 #include <cmath>
 #include <sstream>
 
-// static CommandType parseCommandType(const std::string& cmd) {
-//     if (cmd == "print board")        return CommandType::PrintBoard;
-//     if (cmd.substr(0, 5) == "click") return CommandType::Click;
-//     if (cmd.substr(0, 4) == "jump")  return CommandType::Jump;
-//     if (cmd.substr(0, 4) == "wait")  return CommandType::Wait;
-//     return CommandType::Unknown;
-// }
-
-// static std::pair<int,int> parseXY(const std::string& s) {
-//     int x, y;
-//     std::istringstream(s) >> x >> y;
-//     return {x, y};
-// }
-
 GameEngine::GameEngine() {
     arbiter.setKingCapturedCallback([this](Color w) {
-        gameOver = true;
-        winner = (w == Color::Black) ? "white" : "black";
+        SoundEffects::playGameOver(w, gameOver, winner);
         arbiter = RealTimeArbiter();
     });
+
+    SoundEffects::init()
 }
 
 int GameEngine::rows() const
@@ -36,15 +23,16 @@ int GameEngine::cols() const
     return board.cols;
 }
 
-void GameEngine::handleClick(CellPos pos) {
+void GameEngine::handleClick(CellPos pos, Color color) {
     if (gameOver) return;
     PieceStatus status = pos.valid ? arbiter.getStatus(pos.row, pos.col) : PieceStatus::Idle;
-    ClickResult result = controller.onClick(pos, board, status);
+
+    ClickResult result = controller.onClick(pos, board, status, color);
 
     if (result.action == ClickAction::MoveRequest)
         requestMove(result.from, result.to);
     else if (result.action == ClickAction::JumpRequest)
-        requestJump(result.from);
+        requestJump(result.from, color);
     else return;
 }
 
@@ -72,7 +60,7 @@ void GameEngine::requestMove(CellPos from, CellPos to) {
     arbiter.startMotion(from.row, from.col, to.row, to.col, duration, board);
 }
 
-void GameEngine::requestJump(CellPos pos) {
+void GameEngine::requestJump(CellPos pos, Color playerColor) {
     if (gameOver) return;
 
     if (!pos.valid || board.getPiece(pos.row, pos.col) == nullptr)
@@ -82,6 +70,9 @@ void GameEngine::requestJump(CellPos pos) {
         return;
 
     Piece* piece = board.getPiece(pos.row, pos.col);
+
+    if (piece->color != playerColor) return;
+
     std::string code = piece->toString();
     const AnimConfig& cfg =  animationConfig.getConfig(code, PieceStatus::Jump);
     double speed = cfg.speed_m_per_sec;
@@ -89,7 +80,7 @@ void GameEngine::requestJump(CellPos pos) {
     if (speed <= 0)
         return;
 
-    recordAction(piece,"JUMP " +cellToNotation(pos.row, pos.col));
+    recordAction(piece, "JUMP " +cellToNotation(pos.row, pos.col));
 
     arbiter.startJump(pos.row, pos.col, speed * 1000);
 }
@@ -110,40 +101,6 @@ void GameEngine::handleWait(int ms) {
     score.first += scoreTemp.first;
     score.second += scoreTemp.second;
 }
-
-// void GameEngine::execute(const std::string& cmd) {
-//     switch (parseCommandType(cmd)) {
-//         case CommandType::PrintBoard:
-//             handleWait(0);
-//             BoardPrinter().print(board);
-//             break;
-//         case CommandType::Click: {
-//             if (gameOver) break;
-//             auto [x, y] = parseXY(cmd.substr(6));
-//             CellPos pos = mapper.toCell(x, y, board.rows, board.cols, 
-//                                         cols() * CELL_SIZE_PX, rows() * CELL_SIZE_PX);
-//             handleClick(pos);
-//             break;
-//         }
-//         case CommandType::Jump: {
-//             if (gameOver) break;
-//             auto [x, y] = parseXY(cmd.substr(5));
-//             CellPos pos = mapper.toCell(x, y, board.rows, board.cols, 
-//                                         cols() * CELL_SIZE_PX, rows() * CELL_SIZE_PX);
-//             requestJump(pos);
-//             break;
-//         }
-//         case CommandType::Wait: {
-//             if (gameOver) break;
-//             int ms;
-//             std::istringstream(cmd.substr(5)) >> ms;
-//             handleWait(ms);
-//             break;
-//         }
-//         case CommandType::Unknown:
-//             break;
-//     }
-// }
 
 int GameEngine::clock() const { return arbiter.clock(); }
 

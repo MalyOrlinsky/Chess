@@ -47,7 +47,7 @@
 //             animators.at(key).setState(cs.status);
 //             const Img &frame = animators.at(key).currentImg();
 //             const_cast<Img &>(frame).draw_on(canvas, c * CELL_SIZE_PX, r * CELL_SIZE_PX);
-            
+
 //             if (r == snap.selectedRow && c == snap.selectedCol)
 //                 canvas.draw_rectangle(c * CELL_SIZE_PX, r * CELL_SIZE_PX, CELL_SIZE_PX, CELL_SIZE_PX,
 //                                         cv::Scalar(0, 255, 255, 255), 3);
@@ -76,8 +76,6 @@
 //     code += cs.type;
 //     return code;
 // }
-
-
 
 #include <set>
 #include "AnimatorPool.hpp"
@@ -118,7 +116,7 @@ void AnimatorPool::update(const GameSnapshot &snap, int dt)
     }
 }
 
-void AnimatorPool::drawAll(Img &canvas, const GameSnapshot &snap)
+void AnimatorPool::drawAll(Img &canvas, const GameSnapshot &snap, Color color)
 {
     for (int r = 0; r < snap.rows; r++)
     {
@@ -141,7 +139,9 @@ void AnimatorPool::drawAll(Img &canvas, const GameSnapshot &snap)
                 SIDE_PANEL + c * CELL_SIZE_PX,
                 TOP_PANEL + r * CELL_SIZE_PX);
 
-            if (r == snap.selectedRow && c == snap.selectedCol)
+            auto it = snap.selected.find(color);
+
+            if (it != snap.selected.end() && it->second.first == r && it->second.second == c)
             {
                 canvas.draw_rectangle(
                     SIDE_PANEL + c * CELL_SIZE_PX,

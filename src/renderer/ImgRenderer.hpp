@@ -1,9 +1,8 @@
 #pragma once
-#include "../../cpp/src/img.hpp"
+#include "../../img/src/img.hpp"
 #include "./game_engine/GameSnapshot.hpp"
 #include "AnimatorPool.hpp"
 #include "../config/SpriteLoader.hpp"
-#include "../controllerClick/CellPos.hpp"
 #include "../Constants.hpp"
 #include <functional>
 #include <string>
@@ -19,10 +18,15 @@ public:
 
     void setCommandCallback(CommandCallback cb);
     void setSnapCallback(SnapCallback cb);
+    void setMyColor(Color color);
+
+    void setColorCallback(std::function<Color()> cb);
     
     void run();
 
 private:
+    std::function<Color()> colorCallback;
+
     void drawPlayers(Img& canvas, const GameSnapshot& snap);
     void drawMoves(Img& canvas, const GameSnapshot& snap);
     void drawTitle(Img &canvas, const GameSnapshot &snap);
@@ -35,6 +39,7 @@ private:
     AnimatorPool pool;
     Img boardImg;
     int rows, cols;
+    Color myColor = Color::None;
 
     CommandCallback onCommand;
     SnapCallback getSnap;
