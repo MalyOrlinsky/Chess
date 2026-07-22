@@ -5,5 +5,6 @@ enum class CommandType {
     Jump,
     Wait,
     PrintBoard,
+    GetBoard,
     Unknown
 };

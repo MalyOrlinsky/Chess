@@ -103,3 +103,8 @@ std::pair<int, int> controllerClick::getSelected(Color color) const
 
     return it->second;
 }
+
+std::map<Color, std::pair<int, int>> controllerClick::getAllSelected() const
+{
+    return selected;
+}

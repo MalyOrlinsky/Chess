@@ -1,6 +1,6 @@
 #pragma once
 #include "../../opencv2/src/img.hpp"
-#include "./game_engine/GameSnapshot.hpp"
+#include "./network/GameSnapshot.hpp"
 #include "AnimatorPool.hpp"
 #include "SpriteLoader.hpp"
 #include "../Constants.hpp"

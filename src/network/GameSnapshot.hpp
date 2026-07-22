@@ -18,7 +18,7 @@ struct GameSnapshot {
     std::vector<std::vector<CellSnapshot>> cells;
     bool gameOver = false;
     std::string winner;
-    
+
     std::map<Color, std::pair<int, int>> selected;
 
     std::vector<Motion> motions;

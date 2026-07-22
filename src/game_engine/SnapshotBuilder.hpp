@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../model/Board.hpp"
-#include "GameSnapshot.hpp"
+#include "../network/GameSnapshot.hpp"
 #include "../arbiter/RealTimeArbiter.hpp"
 #include "../controllerClick/controllerClick.hpp"
 

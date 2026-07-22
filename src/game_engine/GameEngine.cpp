@@ -96,7 +96,7 @@ void GameEngine::recordAction(Piece* piece, const std::string& action)
 void GameEngine::handleWait(int ms) {
     if (gameOver) return;
 
-    std::pair<int, int> scoreTemp = arbiter.advanceClock(ms, board);
+    std::pair<int, int> scoreTemp = arbiter.advanceClock(ms, board, controller.getAllSelected());
 
     score.first += scoreTemp.first;
     score.second += scoreTemp.second;

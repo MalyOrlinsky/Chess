@@ -2,9 +2,10 @@
 #include <iostream>
 
 std::vector<Motion> MotionUpdater::update(std::vector<Motion>& motions, std::vector<Jump>& jumps,
-     Board& board, int currentClock, Color& color, std::pair<int, int>& score) {
+     Board& board, int currentClock, Color& color, std::pair<int, int>& score, 
+     std::map<Color, std::pair<int, int>> &selected) {
     CollisionResolver resolver;
-    MotionAdvancer advancer;
+    MotionAdvancer advancer(selected);
 
     // std::vector<Motion> active;
     std::vector<Motion> finished;

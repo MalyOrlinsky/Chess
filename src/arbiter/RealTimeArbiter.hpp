@@ -26,7 +26,8 @@ public:
 
     PieceStatus getStatus(int row, int col) const;
 
-    std::pair<int, int> advanceClock(int ms, Board& board);
+    std::pair<int, int> advanceClock(int ms, Board &board, 
+                        std::map<Color, std::pair<int, int>> &selected);
 
 private:
 

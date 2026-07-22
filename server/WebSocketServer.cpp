@@ -3,11 +3,9 @@
 
 WebSocketServer::WebSocketServer(
     int port,
-    GameEngine &engine,
-    CommandExecutor &executor)
+    GameManager &gameManager)
     : port(port),
-      engine(engine),
-      executor(executor)
+      gameManager(gameManager)
 {
 }
 
@@ -24,68 +22,109 @@ void WebSocketServer::start()
                     << "SERVER CLIENT CONNECTED"
                     << std::endl;
 
-                Color color;
+                PlayerSession session;
 
-                if (players.empty())
-                    color = Color::White;
-                else if (players.size() == 1)
-                    color = Color::Black;
-                else
-                    color = Color::None;
+                session.hdl = hdl;
+                session.username = "";
+                session.color = Color::None;
+                session.gameId = -1;
 
-                players.push_back({hdl, color, ""});
+                players.push_back(session);
 
                 Network::Message playerMessage;
 
                 playerMessage.type = Network::MessageType::PlayerInfo;
-
-                if (color == Color::White)
-                    playerMessage.payload = "white";
-                else if (color == Color::Black)
-                    playerMessage.payload = "black";
-                else
-                    playerMessage.payload = "spectator";
+                playerMessage.payload = "lobby";
 
                 std::string colorJson = Network::Serializer::serialize(playerMessage);
 
                 std::cout << "SEND TO CLIENT:\n"
-          << colorJson
-          << std::endl;
+                          << colorJson
+                          << std::endl;
                 server.send(hdl, colorJson, websocketpp::frame::opcode::text);
 
-                GameSnapshot snapshot = engine.snapshot();
+                PlayerSession &player = getPlayer(hdl);
 
-                std::cout
-                    << "SERVER INITIAL SNAPSHOT: "
-                    << snapshot.rows
-                    << " "
-                    << snapshot.cols
-                    << std::endl;
+                if (player.gameId != -1)
+                {
+                    Game &game = gameManager.getGame(player.gameId);
 
-                Network::Message message;
-                message.type = Network::MessageType::Snapshot;
-                message.payload = Network::Serializer::serializeSnapshot(snapshot);
+                    GameSnapshot snapshot = game.snapshot();
+                    std::cout
+                        << "SERVER INITIAL SNAPSHOT: "
+                        << snapshot.rows
+                        << " "
+                        << snapshot.cols
+                        << std::endl;
+                    Network::Message message;
+                    message.type = Network::MessageType::Snapshot;
+                    message.payload = Network::Serializer::serializeSnapshot(snapshot);
 
-                std::string json = Network::Serializer::serialize(message);
+                    std::string json = Network::Serializer::serialize(message);
+                    std::cout << "SEND TO CLIENT:\n"
+                              << json
+                              << std::endl;
 
-                std::cout << "SEND TO CLIENT:\n"
-          << json
-          << std::endl;
-                server.send(hdl, json, websocketpp::frame::opcode::text);
+                    server.send(hdl, json, websocketpp::frame::opcode::text);
+                }
             });
 
         server.set_message_handler(
             [this](websocketpp::connection_hdl hdl, Server::message_ptr msg)
             {
                 std::cout << "SERVER GOT MESSAGE" << std::endl;
+
                 auto message = Network::Serializer::deserialize(msg->get_payload());
 
-                Color color = getPlayerColor(hdl);
+                if (message.type == Network::MessageType::Login)
+                {
+                    PlayerSession *existing =
+                        findPlayerByUsername(message.payload);
 
+                    if (existing)
+                    {
+                        existing->hdl = hdl;
+                        existing->loggedIn = true;
+                    }
+                    else
+                    {
+                        PlayerSession session;
+
+                        session.hdl = hdl;
+                        session.username = message.payload;
+                        session.color = Color::None;
+                        session.gameId = -1;
+                        session.loggedIn = true;
+
+                        players.push_back(session);
+                    }
+
+                    return;
+                }
+
+                PlayerSession &player = getPlayer(hdl);
+
+                if (message.type == Network::MessageType::Play)
+                {
+                    if (!player.searchingGame && player.gameId == -1)
+                    {
+                        player.searchingGame = true;
+                        matchmakingQueue.push_back(hdl);
+
+                        tryMatchmaking();
+                    }
+
+                    return;
+                }
+
+                if (player.gameId == -1)
+                    return;
+
+                Game &game = gameManager.getGame(player.gameId);
                 if (message.type == Network::MessageType::Command)
-                    executor.execute(message.payload, color);
+                    game.executeCommand(message.payload, player.color);
 
-                GameSnapshot snapshot = engine.snapshot();
+                GameSnapshot snapshot = game.snapshot();
 
                 Network::Message response;
                 response.type = Network::MessageType::Snapshot;
@@ -94,8 +133,8 @@ void WebSocketServer::start()
                 std::string json = Network::Serializer::serialize(response);
 
                 std::cout << "SEND TO CLIENT:\n"
-          << json
-          << std::endl;
+                          << json
+                          << std::endl;
                 server.send(hdl, json, websocketpp::frame::opcode::text);
             });
 
@@ -118,13 +157,55 @@ void WebSocketServer::start()
     }
 }
 
-Color WebSocketServer::getPlayerColor(websocketpp::connection_hdl hdl)
+PlayerSession &WebSocketServer::getPlayer(websocketpp::connection_hdl hdl)
 {
-    for (const auto &player : players)
+    for (auto &player : players)
     {
         if (player.hdl.lock() == hdl.lock())
-            return player.color;
+            return player;
     }
 
-    return Color::None;
+    throw std::runtime_error("Player not found");
+}
+
+void WebSocketServer::tryMatchmaking()
+{
+    if (matchmakingQueue.size() < 2)
+        return;
+
+    websocketpp::connection_hdl hdl1 = matchmakingQueue[0];
+    websocketpp::connection_hdl hdl2 = matchmakingQueue[1];
+
+    PlayerSession &player1 = getPlayer(hdl1);
+    PlayerSession &player2 = getPlayer(hdl2);
+
+    int gameId = gameManager.createGame();
+
+    player1.gameId = gameId;
+    player1.color = Color::White;
+    player1.searchingGame = false;
+
+    player2.gameId = gameId;
+    player2.color = Color::Black;
+    player2.searchingGame = false;
+
+    matchmakingQueue.erase(matchmakingQueue.begin(),
+                           matchmakingQueue.begin() + 2);
+
+    std::cout
+        << "MATCH CREATED gameId="
+        << gameId
+        << std::endl;
+}
+
+PlayerSession *WebSocketServer::findPlayerByUsername(
+    const std::string &username)
+{
+    for (auto &player : players)
+    {
+        if (player.username == username)
+            return &player;
+    }
+
+    return nullptr;
 }

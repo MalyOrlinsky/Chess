@@ -1,7 +1,6 @@
 #include "GameLoop.hpp"
 
-GameLoop::GameLoop(GameEngine& engine) : engine(engine) {}
-
+GameLoop::GameLoop(GameManager& gameManager) : gameManager(gameManager) {}
 
 void GameLoop::start()
 {
@@ -10,8 +9,7 @@ void GameLoop::start()
         {
             while(true)
             {
-                engine.handleWait(16);
-
+                gameManager.update(16);
 
                 std::this_thread::sleep_for(
                     std::chrono::milliseconds(16)

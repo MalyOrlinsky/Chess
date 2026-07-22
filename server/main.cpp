@@ -1,20 +1,18 @@
-#include "../src/game_engine/GameEngine.hpp"
-#include "../src/commands/CommandExecutor.hpp"
+#include "GameManager.hpp"
 #include "GameLoop.hpp"
 #include "WebSocketServer.hpp"
 
 int main()
 {
-    GameEngine engine;
-    engine.loadBoard("board.txt");
+    GameManager gameManager;
 
-    GameLoop loop(engine);
+    int gameId = gameManager.createGame();
+    gameManager.loadBoard(gameId, "board.txt");
+
+    GameLoop loop(gameManager);
     loop.start();
 
-    CommandExecutor executor(engine);
-
-    WebSocketServer server(8080, engine, executor);
-
+    WebSocketServer server(8080, gameManager);
     server.start();
 
     return 0;

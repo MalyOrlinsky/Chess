@@ -5,7 +5,7 @@
 #include "../arbiter/RealTimeArbiter.hpp"
 #include "../controllerClick/controllerClick.hpp"
 #include "../controllerClick/BoardMapper.hpp"
-#include "GameSnapshot.hpp"
+#include "../network/GameSnapshot.hpp"
 #include "../config/AnimationConfigProvider.hpp"
 #include "../config/AnimConfig.hpp"
 #include <string>

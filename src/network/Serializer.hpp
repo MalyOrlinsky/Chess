@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Message.hpp"
-#include "../game_engine/GameSnapshot.hpp"
+#include "../network/GameSnapshot.hpp"
 #include "../model/Piece.hpp"
 #include <string>
 #include <nlohmann/json.hpp>

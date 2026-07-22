@@ -3,7 +3,7 @@
 #include <websocketpp/config/asio_no_tls_client.hpp>
 #include <websocketpp/client.hpp>
 
-#include "../src/game_engine/GameSnapshot.hpp"
+#include "../src/network/GameSnapshot.hpp"
 #include "../src/network/Message.hpp"
 #include "../src/network/Serializer.hpp"
 

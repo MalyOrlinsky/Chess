@@ -14,6 +14,7 @@ public:
     bool hasSelection(Color color) const;
     void clearSelection(Color color);
     std::pair<int, int> getSelected(Color color) const;
+    std::map<Color, std::pair<int, int>> getAllSelected() const;
 
 private:
     std::map<Color, std::pair<int, int>> selected;
