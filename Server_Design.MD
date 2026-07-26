@@ -1,3 +1,12 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+body { direction: rtl; text-align: right; }
+</style>
+</head>
+<body>
+
 # Server Design - Kung Fu Chess
 
 ## 1. מטרת המערכת
@@ -421,3 +430,6 @@ Service -> Internal API -> Service אחר
 חלוקת המשחקים בין מספר Game Services מאפשרת תמיכה בכמות גדולה של משחקים במקביל.
 
 הפרדת האחריות בין השירותים מאפשרת מערכת גמישה, ניתנת להרחבה ומתאימה לעומסים גדולים.
+
+</body>
+</html>
