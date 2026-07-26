@@ -29,8 +29,8 @@ GameSnapshot SnapshotBuilder::build(
     snap.scoreWhite = score.second;
     snap.scoreBlack = score.first;
 
-    snap.playerWhite = "white";
-    snap.playerBlack = "black";
+    snap.playerWhite = "White";
+    snap.playerBlack = "Black";
 
     snap.movesLogWhite = movesLogWhite;
     snap.movesLogBlack = movesLogBlack;

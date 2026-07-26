@@ -1,6 +1,3 @@
-// #include "src/game_engine/GameEngine.hpp"
-// #include "server/NetworkServer.hpp"
-// #include "src/commands/CommandExecutor.hpp"
 #include "NetworkClient.hpp"
 #include "../src/renderer/ImgRenderer.hpp"
 #include "../Board.hpp"
@@ -11,27 +8,7 @@ int main()
 {
     try
     {
-        // GameEngine engine;
-
-        // engine.loadBoard("board.txt");
-
         ImgRenderer renderer("assets/image", "assets/board.png", ROW, COL);
-
-        // CommandExecutor executor(engine);
-
-        // NetworkServer server(8080, executor);
-
-        // std::thread serverThread(
-        //     [&]()
-        //     {
-        //         server.start();
-        //     });
-
-        // renderer.setCommandCallback(
-        //     [&](const std::string &cmd)
-        //     {
-        //         executor.execute(cmd);
-        //     });
 
         NetworkClient client;
 
@@ -39,17 +16,19 @@ int main()
             "localhost",
             8080);
 
+        std::string username;
+
+        std::cout << "Username: ";
+        std::cin >> username;
+
+        client.sendLogin(username);
+        client.sendPlay();
+
         renderer.setCommandCallback(
             [&](const std::string &cmd)
             {
                 client.sendCommand(cmd);
             });
-
-        // renderer.setSnapCallback(
-        //     [&]()
-        //     {
-        //         return engine.snapshot();
-        //     });
 
         renderer.setSnapCallback(
             [&]()

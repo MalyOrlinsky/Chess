@@ -10,6 +10,7 @@
 #include <thread>
 #include <stdexcept>
 #include <string>
+#include <mutex>
 
 class NetworkClient
 {
@@ -18,6 +19,9 @@ public:
 
     void connect(const std::string &host, int port);
     void sendCommand(const std::string &command);
+    void sendLogin(const std::string &username);
+    void sendPlay();
+
     GameSnapshot getLatestSnapshot();
     Color getMyColor() const;
 
@@ -29,7 +33,10 @@ private:
     using Client = websocketpp::client<websocketpp::config::asio_client>;
 
     Client client;
+
     GameSnapshot latestSnapshot;
+    std::mutex snapshotMutex;
+
     Color myColor;
 
     websocketpp::connection_hdl connection;

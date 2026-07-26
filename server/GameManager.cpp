@@ -10,15 +10,16 @@ int GameManager::createGame()
 
     games.emplace(gameId, std::make_unique<Game>());
 
+    games[gameId]->loadBoard("board.txt");
+
     return gameId;
 }
 
-void GameManager::executeCommand(
-    int gameId,
-    const std::string& command,
-    Color playerColor)
+void GameManager::executeCommand(int gameId, const std::string &command, Color playerColor)
 {
-    Game* game = findGame(gameId);
+    std::lock_guard<std::mutex> lock(mutex);
+
+    Game *game = findGame(gameId);
 
     if (game == nullptr)
         return;
@@ -28,19 +29,21 @@ void GameManager::executeCommand(
 
 GameSnapshot GameManager::snapshot(int gameId) const
 {
+    std::lock_guard<std::mutex> lock(mutex);
+
     const Game* game = findGame(gameId);
 
-    if (game == nullptr)
-        return GameSnapshot();
+    if(game == nullptr)
+        return {};
 
     return game->snapshot();
 }
 
 void GameManager::loadBoard(
     int gameId,
-    const std::string& path)
+    const std::string &path)
 {
-    Game* game = findGame(gameId);
+    Game *game = findGame(gameId);
 
     if (game == nullptr)
         return;
@@ -50,18 +53,20 @@ void GameManager::loadBoard(
 
 void GameManager::update(int deltaMs)
 {
-    for (auto& [id, game] : games)
+    std::lock_guard<std::mutex> lock(mutex);
+
+    for (auto &[id, game] : games)
     {
         game->update(deltaMs);
     }
 }
 
-Game& GameManager::getGame(int gameId)
+Game &GameManager::getGame(int gameId)
 {
     return getGameImpl(*this, gameId);
 }
 
-const Game& GameManager::getGame(int gameId) const
+const Game &GameManager::getGame(int gameId) const
 {
     return getGameImpl(*this, gameId);
 }
@@ -71,12 +76,12 @@ void GameManager::removeGame(int gameId)
     games.erase(gameId);
 }
 
-Game* GameManager::findGame(int gameId)
+Game *GameManager::findGame(int gameId)
 {
     return findGameImpl(*this, gameId);
 }
 
-const Game* GameManager::findGame(int gameId) const
+const Game *GameManager::findGame(int gameId) const
 {
     return findGameImpl(*this, gameId);
 }

@@ -7,9 +7,10 @@
 
 struct PlayerSession
 {
-    websocketpp::connection_hdl hdl;
-
+    int id;
     std::string username;
+
+    websocketpp::connection_hdl hdl;
     Color color = Color::None;
 
     int rating = 1200;

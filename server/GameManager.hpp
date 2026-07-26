@@ -5,6 +5,7 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <mutex>
 
 class GameManager
 {
@@ -37,6 +38,7 @@ private:
 
 private:
 
+    mutable std::mutex mutex;
     std::map<int, std::unique_ptr<Game>> games;
 
     int nextGameId = 0;

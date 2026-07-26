@@ -9,10 +9,17 @@ int main()
     int gameId = gameManager.createGame();
     gameManager.loadBoard(gameId, "board.txt");
 
-    GameLoop loop(gameManager);
+    WebSocketServer server(8080, gameManager);
+
+    GameLoop loop(
+        gameManager,
+        [&]()
+        {
+            server.sendAllSnapshots();
+        });
+
     loop.start();
 
-    WebSocketServer server(8080, gameManager);
     server.start();
 
     return 0;

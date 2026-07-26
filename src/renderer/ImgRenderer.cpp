@@ -36,8 +36,8 @@ void ImgRenderer::run()
         int dt = (int)std::chrono::duration_cast<std::chrono::milliseconds>(now - prev).count();
         prev = now;
 
-        if (onCommand)
-            onCommand("wait 0");
+        // if (onCommand)
+        //     onCommand("wait 0");
 
         GameSnapshot snap = getSnap ? getSnap() : GameSnapshot{};
 
