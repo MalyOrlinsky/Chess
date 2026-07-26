@@ -121,29 +121,6 @@ void WebSocketServer::handleLogin(websocketpp::connection_hdl hdl, const Network
         << std::endl;
 }
 
-// void WebSocketServer::handleLogin(websocketpp::connection_hdl hdl, const Network::Message &message)
-// {
-//     PlayerSession *existing = findPlayerByUsername(message.payload);
-
-//     if (existing)
-//     {
-//         existing->hdl = hdl;
-//         existing->loggedIn = true;
-//     }
-//     else
-//     {
-//         PlayerSession session;
-
-//         session.hdl = hdl;
-//         session.username = message.payload;
-//         session.color = Color::None;
-//         session.gameId = -1;
-//         session.loggedIn = true;
-
-//         players.push_back(session);
-//     }
-// }
-
 void WebSocketServer::handlePlay(websocketpp::connection_hdl hdl)
 {
     PlayerSession &player = getPlayer(hdl);
@@ -264,40 +241,6 @@ void WebSocketServer::sendLobby(websocketpp::connection_hdl hdl)
             << std::endl;
     }
 }
-
-// void WebSocketServer::sendPlayerInfo(websocketpp::connection_hdl hdl, Color color)
-// {
-//     Network::Message message;
-//     message.type = Network::MessageType::PlayerInfo;
-
-//     if (color == Color::White)
-//         message.payload = "White";
-
-//     else if (color == Color::Black)
-//         message.payload = "Black";
-
-//     else
-//         message.payload = "None";
-
-//     std::string json = Network::Serializer::serialize(message);
-
-//     std::cout
-//         << "SEND PLAYER INFO:\n"
-//         << json
-//         << std::endl;
-
-//     websocketpp::lib::error_code ec;
-
-//     server.send(hdl, json, websocketpp::frame::opcode::text, ec);
-
-//     if (ec)
-//     {
-//         std::cout
-//             << "SEND ERROR: "
-//             << ec.message()
-//             << std::endl;
-//     }
-// }
 
 void WebSocketServer::sendPlayerInfo(websocketpp::connection_hdl hdl, Color color)
 {
