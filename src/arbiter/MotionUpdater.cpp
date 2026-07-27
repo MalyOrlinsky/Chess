@@ -1,16 +1,17 @@
 #include "MotionUpdater.hpp"
 #include <iostream>
 
-std::vector<Motion> MotionUpdater::update(std::vector<Motion>& motions, std::vector<Jump>& jumps,
-     Board& board, int currentClock, Color& color, std::pair<int, int>& score, 
-     std::map<Color, std::pair<int, int>> &selected) {
+std::vector<Motion> MotionUpdater::update(std::vector<Motion> &motions, std::vector<Jump> &jumps,
+                                          Board &board, int currentClock, Color &color, std::pair<int, int> &score)//,
+                                          //std::map<Color, std::pair<int, int>> &selected)
+{
     CollisionResolver resolver;
-    MotionAdvancer advancer(selected);
+    MotionAdvancer advancer; //(selected);
 
     // std::vector<Motion> active;
     std::vector<Motion> finished;
 
-    for (auto& motion : motions)
+    for (auto &motion : motions)
     {
         if (!motion.valid)
             continue;
@@ -44,13 +45,13 @@ std::vector<Motion> MotionUpdater::update(std::vector<Motion>& motions, std::vec
             motion.valid = false;
             continue;
         }
-
     }
 
     return finished;
 }
 
-bool MotionUpdater::shouldAdvance(const Motion& motion, int currentClock) const {
+bool MotionUpdater::shouldAdvance(const Motion &motion, int currentClock) const
+{
     int elapsed = currentClock - motion.startTime;
     int expectedStep = elapsed / motion.stepDuration;
 

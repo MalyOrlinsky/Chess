@@ -5,7 +5,7 @@
 #include "../movement/KnightRule.hpp"
 #include "../movement/KingRule.hpp"
 #include "../movement/PawnRule.hpp"
-#include "../Constants.hpp"
+#include "../constants.hpp"
 
 RuleResult RuleEngine::validate(int fromRow, int fromCol, int toRow, int toCol,
                                 const Board& board) const {

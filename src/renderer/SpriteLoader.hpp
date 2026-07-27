@@ -4,7 +4,7 @@
 #include "../config/AnimConfig.hpp"
 #include "../config/PieceConfigManager.hpp"
 #include "../model/Piece.hpp"
-#include "../Constants.hpp"
+#include "../constants.hpp"
 #include <filesystem>
 #include <string>
 #include <vector>

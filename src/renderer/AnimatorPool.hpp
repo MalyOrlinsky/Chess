@@ -6,7 +6,7 @@
 #include <map>
 #include <string>
 #include <set>
-#include "../Constants.hpp"
+#include "../constants.hpp"
 
 class AnimatorPool {
 public:

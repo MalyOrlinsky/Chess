@@ -8,14 +8,14 @@ PieceStatus RealTimeArbiter::getNextState(const Piece &piece, PieceStatus curren
     return animationConfig.getConfig(code, currentState).nextState;
 }
 
-std::pair<int, int> RealTimeArbiter::advanceClock(int ms, Board &board, 
-                        std::map<Color, std::pair<int, int>> &selected)
+std::pair<int, int> RealTimeArbiter::advanceClock(int ms, Board &board)//, 
+                        // std::map<Color, std::pair<int, int>> &selected)
 {
     currentClock += ms;
 
     Color color = Color::None;
     std::pair<int, int> score = {0, 0};
-    auto finished = motionUpdater.update(motions, jumps, board, currentClock, color, score, selected);
+    auto finished = motionUpdater.update(motions, jumps, board, currentClock, color, score);//, selected);
 
     if (color != Color::None)
         onKingCaptured(color);

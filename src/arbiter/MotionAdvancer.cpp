@@ -1,10 +1,10 @@
 #include "MotionAdvancer.hpp"
 #include "iostream"
 
-MotionAdvancer::MotionAdvancer(std::map<Color, std::pair<int, int>> &selected)
-{
-    this->selected = selected;
-}
+// MotionAdvancer::MotionAdvancer(std::map<Color, std::pair<int, int>> &selected)
+// {
+//     this->selected = selected;
+// }
 
 std::pair<int, int> MotionAdvancer::advance(Motion &motion, std::vector<Motion> &motions, const std::vector<Jump> &jumps,
                                             Board &board, int currentClock, Color &color)
@@ -19,7 +19,7 @@ std::pair<int, int> MotionAdvancer::advance(Motion &motion, std::vector<Motion> 
     Piece *piece = board.getPiece(next.row, next.col);
     if (piece)
     {
-        SoundEffects::playCapture(piece, score, color, board, next.row, next.col, selected);
+        SoundEffects::playCapture(piece, score, color, board, next.row, next.col);//, selected);
 
         for (auto &m : motions)
         {
@@ -46,7 +46,7 @@ std::pair<int, int> MotionAdvancer::died(Motion &motion, Board &board, Color &co
     auto piece = board.getPiece(motion.path[motion.currentStep].row, motion.path[motion.currentStep].col);
     if (piece)
         SoundEffects::playCapture(piece, score, color, board, motion.path[motion.currentStep].row,
-                                 motion.path[motion.currentStep].col, selected);
+                                 motion.path[motion.currentStep].col);//, selected);
 
     return score;
 }

@@ -15,7 +15,7 @@ int main()
 
         NetworkClient client;
 
-        client.connect("localhost", 8080);
+        client.connect("chess-server", 8080);
 
         Lobby lobby(client);
 

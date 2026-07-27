@@ -10,9 +10,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # External
 # =====================
 
-set(OPENCV_DIR "${CMAKE_CURRENT_SOURCE_DIR}/opencv2/OpenCV_451")
-set(OPENCV_INCLUDE_DIR "${OPENCV_DIR}/include")
-set(OPENCV_LIB_DIR "${OPENCV_DIR}/bin")
+if(WIN32)
+    set(OPENCV_DIR "${CMAKE_CURRENT_SOURCE_DIR}/opencv2/OpenCV_451")
+    set(OPENCV_INCLUDE_DIR "${OPENCV_DIR}/include")
+    set(OPENCV_LIB_DIR "${OPENCV_DIR}/bin")
+endif()
+
+if(UNIX)
+    find_package(OpenCV REQUIRED)
+    set(OPENCV_INCLUDE_DIR ${OpenCV_INCLUDE_DIRS})
+endif()
 
 # =====================
 # Shared source
@@ -80,11 +87,18 @@ target_link_directories(KungFuChessClient PRIVATE
 )
 
 
-target_link_libraries(KungFuChessClient
-    $<$<CONFIG:Debug>:opencv_world451d.lib>
-    $<$<CONFIG:Release>:opencv_world451.lib>
-)
+if(WIN32)
+    target_link_libraries(KungFuChessClient
+        $<$<CONFIG:Debug>:opencv_world451d.lib>
+        $<$<CONFIG:Release>:opencv_world451.lib>
+    )
+endif()
 
+if(UNIX)
+    target_link_libraries(KungFuChessClient
+        ${OpenCV_LIBS}
+    )
+endif()
 
 
 # =====================

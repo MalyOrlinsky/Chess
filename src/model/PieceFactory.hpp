@@ -1,6 +1,6 @@
 #pragma once
 #include "./Piece.hpp"
-#include "../Constants.hpp"
+#include "../constants.hpp"
 #include <string>
 #include <memory>
 

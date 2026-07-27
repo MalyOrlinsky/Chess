@@ -22,25 +22,25 @@ void SoundEffects::playMove(Board &board, Position current, Position next, int t
 }
 
 void SoundEffects::playCapture(Piece *piece, std::pair<int, int> score, Color &color, Board &board,
-                               int row, int col, std::map<Color, std::pair<int, int>> &selected)
+                               int row, int col)//, std::map<Color, std::pair<int, int>> &selected)
 {
-    Color pieceColor = piece->color;
-    int f = pieceColor == Color::White ? 0 : pieceColor == Color::Black ? 1 : 2;
-    auto it = selected.find(pieceColor);
-    int r = 5555555;
-    int c = 5555555;
+    // Color pieceColor = piece->color;
+    // int f = pieceColor == Color::White ? 0 : pieceColor == Color::Black ? 1 : 2;
+    // auto it = selected.find(pieceColor);
+    // int r = 5555555;
+    // int c = 5555555;
 
-    if (it != selected.end())
-    {
-        r = it->second.first;
-        c = it->second.second;
-    }
+    // if (it != selected.end())
+    // {
+    //     r = it->second.first;
+    //     c = it->second.second;
+    // }
 
-    if (r == row && c == col)
-    {
-        it->second.first = -1;
-        it->second.second = -1;
-    }
+    // if (r == row && c == col)
+    // {
+    //     it->second.first = -1;
+    //     it->second.second = -1;
+    // }
 
     // selected[pieceColor] = std::make_pair(-1, -1);
 

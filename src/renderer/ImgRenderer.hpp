@@ -3,7 +3,7 @@
 #include "./network/GameSnapshot.hpp"
 #include "AnimatorPool.hpp"
 #include "SpriteLoader.hpp"
-#include "../Constants.hpp"
+#include "../constants.hpp"
 #include <functional>
 #include <string>
 #include <chrono>

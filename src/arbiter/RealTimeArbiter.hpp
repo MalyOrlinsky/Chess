@@ -6,7 +6,7 @@
 #include "../model/Board.hpp"
 #include "../movement/PathBuilder.hpp"
 #include "../config/AnimationConfigProvider.hpp"
-#include "../Constants.hpp"
+#include "../constants.hpp"
 #include <vector>
 #include <functional>
 #include <string>
@@ -26,8 +26,8 @@ public:
 
     PieceStatus getStatus(int row, int col) const;
 
-    std::pair<int, int> advanceClock(int ms, Board &board, 
-                        std::map<Color, std::pair<int, int>> &selected);
+    std::pair<int, int> advanceClock(int ms, Board &board);//, 
+                        // std::map<Color, std::pair<int, int>> &selected);
 
 private:
 
