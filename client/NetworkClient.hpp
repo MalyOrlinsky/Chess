@@ -21,7 +21,10 @@ public:
     void sendCommand(const std::string &command);
     void sendLogin(const std::string &username);
     void sendPlay();
+    void sendRoom(const std::string& roomName);
 
+    std::string getLobbyStatus() const;
+    bool isGameStarted() const;
     GameSnapshot getLatestSnapshot();
     Color getMyColor() const;
 
@@ -29,6 +32,7 @@ private:
 
     void handleSnapshot(const std::string& data);
     void handlePlayerInfo(const Network::Message& message);
+    void handleLobbyStatus(const Network::Message& message);
 
     using Client = websocketpp::client<websocketpp::config::asio_client>;
 
@@ -38,8 +42,9 @@ private:
     std::mutex snapshotMutex;
 
     Color myColor;
-
     websocketpp::connection_hdl connection;
+    std::string lobbyStatus = "Lobby";
+    bool gameStarted = false;
 
     bool connected = false;
 };

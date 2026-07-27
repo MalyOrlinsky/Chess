@@ -64,9 +64,9 @@ void WebSocketServer::onOpen(websocketpp::connection_hdl hdl)
     players.push_back(session);
 
     std::cout
-    << "PLAYER CONNECTED id="
-    << session.id
-    << std::endl;
+        << "PLAYER CONNECTED id="
+        << session.id
+        << std::endl;
 
     sendLobby(hdl);
 
@@ -106,6 +106,12 @@ void WebSocketServer::onMessage(websocketpp::connection_hdl hdl, Server::message
         handleCommand(hdl, message);
         return;
     }
+
+    if (message.type == Network::MessageType::Room)
+    {
+        handleRoom(hdl, message);
+        return;
+    }
 }
 
 void WebSocketServer::handleLogin(websocketpp::connection_hdl hdl, const Network::Message &message)
@@ -130,6 +136,8 @@ void WebSocketServer::handlePlay(websocketpp::connection_hdl hdl)
         player.searchingGame = true;
 
         matchmakingQueue.push_back(&player);
+
+        sendLobbyStatus(hdl, "Searching");
 
         tryMatchmaking();
     }
@@ -178,19 +186,15 @@ void WebSocketServer::createMatch(PlayerSession &white, PlayerSession &black)
         << "MATCH CREATED gameId="
         << gameId
         << std::endl;
-    std::cout << "BEFORE WHITE INFO" << std::endl;
+
+    sendLobbyStatus(white.hdl, "GameFound");
+    sendLobbyStatus(black.hdl, "GameFound");
 
     sendPlayerInfo(white.hdl, Color::White);
-    std::cout << "BEFORE BLACK INFO" << std::endl;
-
     sendPlayerInfo(black.hdl, Color::Black);
-    std::cout << "BEFORE WHITE SNAPSHOT" << std::endl;
 
     sendSnapshot(white.hdl);
-    std::cout << "BEFORE BLACK SNAPSHPT" << std::endl;
-
     sendSnapshot(black.hdl);
-    std::cout << "AFTER ALL" << std::endl;
 }
 
 PlayerSession &WebSocketServer::getPlayer(websocketpp::connection_hdl hdl)
@@ -237,6 +241,28 @@ void WebSocketServer::sendLobby(websocketpp::connection_hdl hdl)
     {
         std::cout
             << "SEND LOBBY ERROR: "
+            << ec.message()
+            << std::endl;
+    }
+}
+
+void WebSocketServer::sendLobbyStatus(websocketpp::connection_hdl hdl, const std::string &status)
+{
+    Network::Message message;
+
+    message.type = Network::MessageType::LobbyStatus;
+    message.payload = status;
+
+    std::string json = Network::Serializer::serialize(message);
+
+    websocketpp::lib::error_code ec;
+
+    server.send(hdl, json, websocketpp::frame::opcode::text, ec);
+
+    if (ec)
+    {
+        std::cout
+            << "SEND LOBBY STATUS ERROR: "
             << ec.message()
             << std::endl;
     }
@@ -320,14 +346,14 @@ void WebSocketServer::sendSnapshot(websocketpp::connection_hdl hdl, const GameSn
 
 void WebSocketServer::sendGameSnapshot(int gameId)
 {
-    std::cout 
-    << "SEND GAME SNAPSHOT game="
-    << gameId
-    << std::endl;
+    std::cout
+        << "SEND GAME SNAPSHOT game="
+        << gameId
+        << std::endl;
 
-    for(auto &player : players)
+    for (auto &player : players)
     {
-        if(player.gameId == gameId)
+        if (player.gameId == gameId)
         {
             sendSnapshot(player.hdl);
         }
@@ -336,11 +362,23 @@ void WebSocketServer::sendGameSnapshot(int gameId)
 
 void WebSocketServer::sendAllSnapshots()
 {
-    for(auto& player : players)
+    for (auto &player : players)
     {
-        if(player.gameId == -1)
+        if (player.gameId == -1)
             continue;
 
         sendSnapshot(player.hdl);
     }
+}
+
+void WebSocketServer::handleRoom(websocketpp::connection_hdl hdl, const Network::Message &message)
+{
+    PlayerSession &player = getPlayer(hdl);
+
+    std::cout
+        << "ROOM REQUEST player="
+        << player.username
+        << " room="
+        << message.payload
+        << std::endl;
 }

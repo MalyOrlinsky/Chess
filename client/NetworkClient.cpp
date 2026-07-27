@@ -32,6 +32,11 @@ NetworkClient::NetworkClient()
                 case Network::MessageType::PlayerInfo:
                     handlePlayerInfo(message);
                     break;
+
+                case Network::MessageType::LobbyStatus:
+                    handleLobbyStatus(message);
+                    break;
+
                 default:
                     break;
                 }
@@ -143,8 +148,6 @@ Color NetworkClient::getMyColor() const
 
 void NetworkClient::handleSnapshot(const std::string &data)
 {
-    std::cout << "NEW SNAPSHOT RECEIVED" << std::endl;
-
     GameSnapshot snapshot = Network::Serializer::deserializeSnapshot(data);
 
     std::lock_guard<std::mutex> lock(snapshotMutex);
@@ -160,4 +163,48 @@ void NetworkClient::handlePlayerInfo(const Network::Message &message)
         myColor = Color::Black;
     else
         myColor = Color::None;
+}
+
+void NetworkClient::handleLobbyStatus(const Network::Message &message)
+{
+    lobbyStatus = message.payload;
+
+    if (lobbyStatus == "GameFound")
+    {
+        gameStarted = true;
+    }
+
+    std::cout
+        << "LOBBY STATUS: "
+        << lobbyStatus
+        << std::endl;
+}
+
+std::string NetworkClient::getLobbyStatus() const
+{
+    return lobbyStatus;
+}
+
+bool NetworkClient::isGameStarted() const
+{
+    return gameStarted;
+}
+
+void NetworkClient::sendRoom(const std::string& roomName)
+{
+    if (!connected)
+        return;
+
+    Network::Message message;
+
+    message.type = Network::MessageType::Room;
+    message.payload = roomName;
+
+    std::string json =
+        Network::Serializer::serialize(message);
+
+    client.send(
+        connection,
+        json,
+        websocketpp::frame::opcode::text);
 }

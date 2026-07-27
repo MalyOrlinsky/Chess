@@ -1,7 +1,10 @@
 #include "NetworkClient.hpp"
 #include "../src/renderer/ImgRenderer.hpp"
 #include "../Board.hpp"
-#include <thread>
+#include "../src/renderer/Lobby.hpp"
+
+// #include <chrono>
+// #include <thread>
 #include <iostream>
 
 int main()
@@ -12,17 +15,24 @@ int main()
 
         NetworkClient client;
 
-        client.connect(
-            "localhost",
-            8080);
+        client.connect("localhost", 8080);
 
-        std::string username;
+        Lobby lobby(client);
 
-        std::cout << "Username: ";
-        std::cin >> username;
+        lobby.run();
 
-        client.sendLogin(username);
-        client.sendPlay();
+        // std::string username;
+
+        // std::cout << "Username: ";
+        // std::cin >> username;
+
+        // client.sendLogin(username);
+
+        // std::cout << "Press ENTER to search for a game...";
+        // std::cin.ignore();
+        // std::cin.get();
+
+        // client.sendPlay();
 
         renderer.setCommandCallback(
             [&](const std::string &cmd)
@@ -41,6 +51,12 @@ int main()
             {
                 return client.getMyColor();
             });
+
+        // while (!client.isGameStarted())
+        // {
+        //     std::this_thread::sleep_for(
+        //         std::chrono::milliseconds(100));
+        // }
 
         renderer.run();
     }

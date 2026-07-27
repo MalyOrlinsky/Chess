@@ -42,8 +42,11 @@ private:
     void sendGameSnapshot(int gameId);
     void sendSnapshot(websocketpp::connection_hdl hdl);
     void sendSnapshot(websocketpp::connection_hdl hdl, const GameSnapshot &snapshot);
+    void sendLobbyStatus(websocketpp::connection_hdl hdl, const std::string &status);
 
 private:
+    void handleRoom(websocketpp::connection_hdl hdl, const Network::Message &message);
+
     std::list<PlayerSession> players;
     std::vector<PlayerSession *> matchmakingQueue;
 

@@ -17,7 +17,6 @@ std::pair<int,int> CommandExecutor::parseXY(const std::string& s) {
 }
 
 void CommandExecutor::execute(const std::string& cmd, Color playerColor) {
-    std::cout << cmd << std::endl;
     switch (parseCommandType(cmd)) {
         case CommandType::PrintBoard:
             engine.handleWait(0);

@@ -13,7 +13,6 @@ bool SoundEffects::init()
 
 void SoundEffects::playMove(Board &board, Position current, Position next, int theRow)
 {
-    std::cout << "PlayMove" << std::endl;
     board.movePiece(current.row, current.col, next.row, next.col);
 
     if (next.row == theRow)
@@ -25,7 +24,6 @@ void SoundEffects::playMove(Board &board, Position current, Position next, int t
 void SoundEffects::playCapture(Piece *piece, std::pair<int, int> score, Color &color, Board &board,
                                int row, int col, std::map<Color, std::pair<int, int>> &selected)
 {
-    std::cout << "PlayCapture#####################################################" << std::endl;
     Color pieceColor = piece->color;
     int f = pieceColor == Color::White ? 0 : pieceColor == Color::Black ? 1 : 2;
     auto it = selected.find(pieceColor);
@@ -37,8 +35,6 @@ void SoundEffects::playCapture(Piece *piece, std::pair<int, int> score, Color &c
         r = it->second.first;
         c = it->second.second;
     }
-    std::cout << f << " " << r << " " << row << " " << c << " " << col << std::endl;
-    // throw std::runtime_error("&&&&&&&&&&&&&&&&&&&&&&&");
 
     if (r == row && c == col)
     {

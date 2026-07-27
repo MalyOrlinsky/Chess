@@ -11,7 +11,9 @@ namespace Network
         Snapshot,
         Text,
         Error,
-        PlayerInfo
+        PlayerInfo,
+        LobbyStatus,
+        Room
     };
 
 }

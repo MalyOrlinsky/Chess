@@ -27,6 +27,12 @@ namespace Network
 
         case MessageType::PlayerInfo:
             return "PlayerInfo";
+
+        case MessageType::LobbyStatus:
+            return "LobbyStatus";
+
+        case MessageType::Room:
+            return "Room";
         }
 
         return "Unknown";
@@ -54,6 +60,12 @@ namespace Network
 
         if (type == "PlayerInfo")
             return MessageType::PlayerInfo;
+
+        if (type == "LobbyStatus")
+            return MessageType::LobbyStatus;
+
+        if (type == "Room")
+            return MessageType::Room;
 
         throw std::runtime_error("Unknown message type");
     }
