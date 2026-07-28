@@ -3,6 +3,16 @@
 ClickResult controllerClick::onClick(CellPos pos, const Board &board, PieceStatus status,
                                      Color currentPlayer)
 {
+    if (hasSelection(currentPlayer))
+    {
+        auto pieceSelect = board.getPiece(selected[currentPlayer].first, selected[currentPlayer].second);
+        if (pieceSelect->color != currentPlayer)
+        {
+            clearSelection(currentPlayer);
+            return {ClickAction::None};
+        }
+    }
+
     if (!pos.valid)
     {
         if (hasSelection(currentPlayer))

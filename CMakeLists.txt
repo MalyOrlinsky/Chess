@@ -43,7 +43,6 @@ file(GLOB_RECURSE CLIENT_SOURCES
     "opencv2/src/img.cpp"
     "client/*.cpp"
     "src/renderer/*.cpp"
-    "src/controllerClick/*.cpp"
     "src/network/*.cpp"
 )
 
@@ -51,7 +50,6 @@ file(GLOB_RECURSE CLIENT_HEADERS
     "opencv2/src/img.hpp"
     "client/*.hpp"
     "src/renderer/*.hpp"
-    "src/controllerClick/*.hpp"
     "src/network/*.hpp"
 )
 

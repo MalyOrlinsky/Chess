@@ -1,11 +1,11 @@
 # Kung-Fu Chess
 
-מנוע שחמט בזמן אמת ב־C++17.
+מנוע שחמט בזמן אמת ב־C++17 עם לקוח ושרת מבוסס WebSocket.
 
-הפרויקט מחולק ל־Client ו־Server:
+הפרויקט מחולק לשתי תוכניות עיקריות:
 
-* Client אחראי על תקשורת, קלט משתמש ותצוגה.
-* Server אחראי על ניהול מצב המשחק, חוקי המשחק ועדכון תנועות.
+* **Client** – מטפל בקלט משתמש, הצגה ותקשורת WebSocket.
+* **Server** – מנהל מצב המשחק, חישובי חוקיות, עדכון תנועות ולולאת משחק בזמן אמת.
 
 ---
 
@@ -14,39 +14,61 @@
 ```
 Chess/
 │
+├── AI.MD
+├── CMakeLists.txt
+├── README.md
+├── Server_Design.MD
+├── board.txt
 ├── client/
 │   ├── main.cpp
 │   ├── NetworkClient.cpp
 │   └── NetworkClient.hpp
-│
 ├── server/
 │   ├── main.cpp
 │   ├── GameLoop.cpp
 │   ├── GameLoop.hpp
+│   ├── Game.cpp
+│   ├── Game.hpp
+│   ├── GameManager.cpp
+│   ├── GameManager.hpp
+│   ├── GameManager.tpp
 │   ├── PlayerSession.hpp
 │   ├── WebSocketServer.cpp
 │   └── WebSocketServer.hpp
-│
 ├── src/
+│   ├── audio/
+│   ├── commands/
+│   ├── config/
+│   ├── controllerClick/
+│   ├── game_engine/
 │   ├── model/
 │   ├── movement/
-│   ├── rule_engine/
-│   ├── arbiter/
-│   ├── game_engine/
 │   ├── network/
-│   ├── commands/
-│   ├── text_io/
-│   ├── config/
 │   ├── renderer/
-│   ├── controllerClick/
-│   ├── audio/
-│
-└── CMakeLists.txt
+│   ├── rule_engine/
+│   └── arbiter/
+├── opencv2/
+│   ├── OpenCV_451/
+│   └── src/
+│       ├── img.cpp
+│       └── img.hpp
+├── external/
+│   ├── asio/
+│   ├── nlohmann/
+│   └── websocketpp/
+├── assets/
+│   ├── image/
+│   └── sounds/
+├── core/
+│   └── game/
+├── tests/
+├── type/
+└── vcpkg/
 ```
 
 ---
 
-# ארכיטקטורה
+# אדריכלות
 
 ```
 Client
@@ -59,99 +81,101 @@ GameLoop
  |
 GameEngine
  |
-+----------------+
-| RuleEngine     |
-| RealTimeArbiter|
-+----------------+
++-------------------+
+| RuleEngine        |
+| RealTimeArbiter   |
++-------------------+
  |
-Board
- |
-Piece
+Board / Piece / State
 ```
 
 ---
 
-# שכבות
+# מודולים ושכבות
 
 ## Model
 
-מכיל את מודל המשחק:
+מכיל את מודל המשחק הבסיסי:
 
-* Board
-* Piece
-* PieceFactory
+* `Board`
+* `Piece`
+* `PieceFactory`
 
-אינו תלוי בממשק משתמש.
+המודל אינו תלוי בממשק משתמש או ברכיבי רינדור.
 
 ---
 
 ## Movement
 
-מכיל חוקי תנועה:
+מכיל את חוקי התנועה לכל כלי:
 
-* PawnRule
-* RookRule
-* BishopRule
-* KnightRule
-* QueenRule
-* KingRule
+* `PawnRule`
+* `RookRule`
+* `BishopRule`
+* `KnightRule`
+* `QueenRule`
+* `KingRule`
 
-מבוסס על Strategy Pattern.
+שכבה זו מיישמת את `Strategy Pattern` עבור חוקי התנועה.
 
 ---
 
 ## Rule Engine
 
-אחראי על בדיקות חוקיות:
+מבצע בדיקות תקינות לתנועה:
 
-* בדיקת תנועה
-* בדיקת גבולות
-* בדיקת מסלולים
-* בדיקת כלי מקור ויעד
+* חוקיות מהלך
+* גבולות לוח
+* מסלול פתוח
+* תקינות מקור ויעד
 
 ---
 
 ## Arbiter
 
-ניהול תנועות בזמן אמת:
+מנהל לוגיקה של תנועות בזמן אמת:
 
-* Motion
-* MotionUpdater
-* MotionAdvancer
-* CollisionResolver
-* RealTimeArbiter
+* `Motion`
+* `MotionUpdater`
+* `MotionAdvancer`
+* `CollisionResolver`
+* `RealTimeArbiter`
 
 ---
 
 ## Game Engine
 
-שכבת תיאום:
+שכבת תיאום בין רכיבי המשחק:
 
-* ניהול מצב משחק
-* יצירת Snapshot
-* חיבור בין מנגנוני המשחק
+* ניהול מצב המשחק
+* יצירת snapshot
+* חיבור בין מודל, תנועה וחוקיות
 
 ---
 
 ## Network
 
-תקשורת:
+אחראי על תקשורת בין לקוח לשרת:
 
-* Protocol
-* Message
-* Serializer
-* WebSocketServer
-* NetworkClient
+* `Protocol`
+* `Message`
+* `Serializer`
+* `WebSocketServer`
+* `NetworkClient`
 
 ---
 
-## Renderer
+## Client UI
 
-אחראי להצגת המשחק:
+* `renderer/` – רינדור תמונה ומצב המשחק.
+* `controllerClick/` – מיפוי לחיצות וקלט משתמש.
+* `audio/` – ניהול אפקטי סאונד.
 
-* ImgRenderer
-* SpriteAnimator
-* AnimatorPool
+---
+
+## Configuration
+
+* `src/config/` – קבצי קונפיגורציה משותפים ללקוח ולשרת.
 
 ---
 
@@ -195,7 +219,7 @@ BoardBuilder
 
 ## DTO Pattern
 
-העברת מידע לתצוגה:
+העברת מצב המשחק לתצוגה:
 
 ```
 Game State
@@ -209,9 +233,7 @@ Renderer
 
 ---
 
-# הידור
-
-דרישות:
+# דרישות
 
 * C++17
 * CMake 3.16+
@@ -231,17 +253,13 @@ cmake --build build --config Release
 
 # הרצה
 
-Client:
-
-Windows:
+Client (Windows):
 
 ```bash
 build/Release/KungFuChessClient.exe
 ```
 
-Server:
-
-Windows:
+Server (Windows):
 
 ```bash
 build/Release/KungFuChessServer.exe
@@ -251,18 +269,18 @@ build/Release/KungFuChessServer.exe
 
 # אחריות מחלקות מרכזיות
 
-| מחלקה           | אחריות            |
-| --------------- | ----------------- |
-| Board           | ניהול מצב הלוח    |
-| Piece           | מודל כלי          |
-| PieceFactory    | יצירת כלים        |
-| RuleEngine      | בדיקת חוקיות      |
-| RealTimeArbiter | ניהול תנועות      |
-| GameEngine      | תיאום מערכת המשחק |
-| Serializer      | המרת הודעות       |
-| NetworkClient   | תקשורת Client     |
-| WebSocketServer | תקשורת Server     |
-| Renderer        | הצגת מצב המשחק    |
+| מחלקה             | אחריות                                |
+| ----------------- | ------------------------------------- |
+| `Board`           | ניהול מצב הלוח                         |
+| `Piece`           | מודל כלי                               |
+| `PieceFactory`    | יצירת כלים                             |
+| `RuleEngine`      | בדיקת חוקיות ומשחק חוקי                |
+| `RealTimeArbiter` | ניהול תנועות וקונפליקטים בזמן אמת     |
+| `GameManager`     | ניהול מצבי משחק וסשנים בשרת            |
+| `Serializer`      | המרת הודעות לנתונים ובחזרה             |
+| `NetworkClient`   | תקשורת לקוח עם השרת                   |
+| `WebSocketServer` | תקשורת שרת עם לקוחות WebSocket         |
+| `Renderer`        | הצגת מצב המשחק והאנימציה              |
 
 ---
 

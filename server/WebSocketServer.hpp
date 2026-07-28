@@ -6,6 +6,8 @@
 #include "../src/network/Serializer.hpp"
 #include "GameManager.hpp"
 #include "PlayerSession.hpp"
+#include "RoomManager.hpp"
+#include "MatchmakingManager.hpp"
 
 #include <list>
 #include <vector>
@@ -31,9 +33,6 @@ private:
     void handlePlay(websocketpp::connection_hdl hdl);
     void handleCommand(websocketpp::connection_hdl hdl, const Network::Message &message);
 
-    void tryMatchmaking();
-    void createMatch(PlayerSession &white, PlayerSession &black);
-
     PlayerSession &getPlayer(websocketpp::connection_hdl hdl);
     PlayerSession *findPlayerByUsername(const std::string &username);
 
@@ -48,7 +47,6 @@ private:
     void handleRoom(websocketpp::connection_hdl hdl, const Network::Message &message);
 
     std::list<PlayerSession> players;
-    std::vector<PlayerSession *> matchmakingQueue;
 
     Server server;
 
@@ -57,4 +55,6 @@ private:
     int nextPlayerId = 1;
 
     GameManager &gameManager;
+    RoomManager roomManager;
+    MatchmakingManager matchmakingManager;
 };

@@ -2,8 +2,17 @@
 #include <iostream>
 
 WebSocketServer::WebSocketServer(int port, GameManager &gameManager)
-    : port(port), gameManager(gameManager) {}
-
+    : port(port), gameManager(gameManager),
+      matchmakingManager(gameManager, [this](PlayerSession &white, PlayerSession &black)
+                         {
+                            sendLobbyStatus(white.hdl, "GameFound");
+                            sendLobbyStatus(black.hdl, "GameFound");
+                            sendPlayerInfo(white.hdl, Color::White);
+                            sendPlayerInfo(black.hdl, Color::Black);
+                            sendSnapshot(white.hdl);
+                            sendSnapshot(black.hdl); })
+{
+}
 void WebSocketServer::start()
 {
     try
@@ -131,16 +140,14 @@ void WebSocketServer::handlePlay(websocketpp::connection_hdl hdl)
 {
     PlayerSession &player = getPlayer(hdl);
 
-    if (!player.searchingGame && player.gameId == -1)
-    {
-        player.searchingGame = true;
+    if (player.gameId != -1)
+        return;
 
-        matchmakingQueue.push_back(&player);
+    sendLobbyStatus(
+        hdl,
+        "Searching");
 
-        sendLobbyStatus(hdl, "Searching");
-
-        tryMatchmaking();
-    }
+    matchmakingManager.addPlayer(&player);
 }
 
 void WebSocketServer::handleCommand(websocketpp::connection_hdl hdl, const Network::Message &message)
@@ -155,46 +162,6 @@ void WebSocketServer::handleCommand(websocketpp::connection_hdl hdl, const Netwo
     game.executeCommand(message.payload, player.color);
 
     sendGameSnapshot(player.gameId);
-}
-
-void WebSocketServer::tryMatchmaking()
-{
-    if (matchmakingQueue.size() < 2)
-        return;
-
-    PlayerSession *player1 = matchmakingQueue[0];
-    PlayerSession *player2 = matchmakingQueue[1];
-
-    matchmakingQueue.erase(matchmakingQueue.begin(), matchmakingQueue.begin() + 2);
-
-    createMatch(*player1, *player2);
-}
-
-void WebSocketServer::createMatch(PlayerSession &white, PlayerSession &black)
-{
-    int gameId = gameManager.createGame();
-
-    white.gameId = gameId;
-    white.color = Color::White;
-    white.searchingGame = false;
-
-    black.gameId = gameId;
-    black.color = Color::Black;
-    black.searchingGame = false;
-
-    std::cout
-        << "MATCH CREATED gameId="
-        << gameId
-        << std::endl;
-
-    sendLobbyStatus(white.hdl, "GameFound");
-    sendLobbyStatus(black.hdl, "GameFound");
-
-    sendPlayerInfo(white.hdl, Color::White);
-    sendPlayerInfo(black.hdl, Color::Black);
-
-    sendSnapshot(white.hdl);
-    sendSnapshot(black.hdl);
 }
 
 PlayerSession &WebSocketServer::getPlayer(websocketpp::connection_hdl hdl)
@@ -354,9 +321,7 @@ void WebSocketServer::sendGameSnapshot(int gameId)
     for (auto &player : players)
     {
         if (player.gameId == gameId)
-        {
             sendSnapshot(player.hdl);
-        }
     }
 }
 
@@ -375,10 +340,5 @@ void WebSocketServer::handleRoom(websocketpp::connection_hdl hdl, const Network:
 {
     PlayerSession &player = getPlayer(hdl);
 
-    std::cout
-        << "ROOM REQUEST player="
-        << player.username
-        << " room="
-        << message.payload
-        << std::endl;
+    roomManager.joinRoom(message.payload, &player, matchmakingManager);
 }
