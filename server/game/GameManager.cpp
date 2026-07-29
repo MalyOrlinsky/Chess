@@ -57,6 +57,7 @@ void GameManager::update(int deltaMs)
 
     for (auto &[id, game] : games)
     {
+        game->checkDisconnect();
         game->update(deltaMs);
     }
 }

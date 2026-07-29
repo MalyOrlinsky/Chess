@@ -1,7 +1,8 @@
 #pragma once
 
-#include "PlayerSession.hpp"
-#include "GameManager.hpp"
+#include "../PlayerSession.hpp"
+#include "../game/GameManager.hpp"
+#include "../room/Room.hpp"
 
 #include <vector>
 #include <functional>
@@ -15,6 +16,7 @@ public:
 
     void addPlayer(PlayerSession *player);
     void startMatch(PlayerSession &player1, PlayerSession &player2);
+    void handleRoom(Room& room);
     
 private:
     void tryMatch();

@@ -31,6 +31,10 @@ void MatchmakingManager::createMatch(PlayerSession &white, PlayerSession &black)
 
     assignPlayers(white, black, gameId);
 
+    Game &game = gameManager.getGame(gameId);
+
+    game.setPlayers(&white, &black);
+
     if (matchFoundCallback)
         matchFoundCallback(white, black);
 }
@@ -54,4 +58,18 @@ void MatchmakingManager::assignPlayers(PlayerSession &white, PlayerSession &blac
 void MatchmakingManager::startMatch(PlayerSession &player1, PlayerSession &player2)
 {
     createMatch(player1, player2);
+}
+
+void MatchmakingManager::handleRoom(Room &room)
+{
+    if (room.users.size() == 2)
+        createMatch(*room.users[0], *room.users[1]);
+
+    else if (room.users.size() > 2)
+    {
+        PlayerSession *spectator = room.users.back();
+
+        spectator->gameId = room.users[0]->gameId;
+        spectator->color = Color::None;
+    }
 }

@@ -35,7 +35,7 @@ Room *RoomManager::joinRoom(const std::string &name, PlayerSession *player, Matc
 
     addUser(*room, player);
 
-    handleRoomState(*room, matchmakingManager);
+    matchmakingManager.handleRoom(*room);
 
     return room;
 }
@@ -43,18 +43,4 @@ Room *RoomManager::joinRoom(const std::string &name, PlayerSession *player, Matc
 bool RoomManager::hasEnoughPlayers(const Room &room) const
 {
     return room.users.size() >= 2;
-}
-
-void RoomManager::handleRoomState(Room &room, MatchmakingManager &matchmakingManager)
-{
-    if (room.users.size() == 2)
-        matchmakingManager.startMatch(*room.users[0], *room.users[1]);
-
-    else if (room.users.size() > 2)
-    {
-        PlayerSession *spectator = room.users.back();
-
-        spectator->gameId = room.users[0]->gameId;
-        spectator->color = Color::None;
-    }
 }

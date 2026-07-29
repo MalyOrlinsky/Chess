@@ -3,8 +3,6 @@
 #include "../Board.hpp"
 #include "../src/renderer/Lobby.hpp"
 
-// #include <chrono>
-// #include <thread>
 #include <iostream>
 
 int main()
@@ -20,19 +18,6 @@ int main()
         Lobby lobby(client);
 
         lobby.run();
-
-        // std::string username;
-
-        // std::cout << "Username: ";
-        // std::cin >> username;
-
-        // client.sendLogin(username);
-
-        // std::cout << "Press ENTER to search for a game...";
-        // std::cin.ignore();
-        // std::cin.get();
-
-        // client.sendPlay();
 
         renderer.setCommandCallback(
             [&](const std::string &cmd)
@@ -51,12 +36,6 @@ int main()
             {
                 return client.getMyColor();
             });
-
-        // while (!client.isGameStarted())
-        // {
-        //     std::this_thread::sleep_for(
-        //         std::chrono::milliseconds(100));
-        // }
 
         renderer.run();
     }

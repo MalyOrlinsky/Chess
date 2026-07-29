@@ -1,18 +1,22 @@
 #include "WebSocketServer.hpp"
 #include <iostream>
 
-WebSocketServer::WebSocketServer(int port, GameManager &gameManager)
-    : port(port), gameManager(gameManager),
-      matchmakingManager(gameManager, [this](PlayerSession &white, PlayerSession &black)
-                         {
-                            sendLobbyStatus(white.hdl, "GameFound");
-                            sendLobbyStatus(black.hdl, "GameFound");
-                            sendPlayerInfo(white.hdl, Color::White);
-                            sendPlayerInfo(black.hdl, Color::Black);
-                            sendSnapshot(white.hdl);
-                            sendSnapshot(black.hdl); })
-{
-}
+WebSocketServer::WebSocketServer(int port, GameManager &gameManager, Database &database)
+    : port(port), gameManager(gameManager), database(database), userManager(database),
+      matchmakingManager(
+          gameManager,
+          [this](PlayerSession &white, PlayerSession &black)
+          {
+              sendLobbyStatus(white.hdl, "GameFound");
+              sendLobbyStatus(black.hdl, "GameFound");
+
+              sendPlayerInfo(white.hdl, Color::White);
+              sendPlayerInfo(black.hdl, Color::Black);
+
+              sendSnapshot(white.hdl);
+              sendSnapshot(black.hdl);
+          }) {}
+
 void WebSocketServer::start()
 {
     try
@@ -87,7 +91,32 @@ void WebSocketServer::onOpen(websocketpp::connection_hdl hdl)
 
 void WebSocketServer::onClose(websocketpp::connection_hdl hdl)
 {
-    // TODO
+    for (auto it = players.begin(); it != players.end(); ++it)
+    {
+        if (it->hdl.lock() == hdl.lock())
+        {
+            std::cout
+                << "PLAYER DISCONNECTED id="
+                << it->id
+                << std::endl;
+
+            if (it->gameId != -1 && it->color != Color::None)
+            {
+                it->disconnected = true;
+                it->disconnectTime = std::chrono::steady_clock::now();
+
+                std::cout
+                    << "PLAYER DISCONNECTED DURING GAME id="
+                    << it->id
+                    << std::endl;
+
+                return;
+            }
+
+            players.erase(it);
+            return;
+        }
+    }
 }
 
 void WebSocketServer::onMessage(websocketpp::connection_hdl hdl, Server::message_ptr msg)
@@ -127,13 +156,26 @@ void WebSocketServer::handleLogin(websocketpp::connection_hdl hdl, const Network
 {
     PlayerSession &player = getPlayer(hdl);
 
-    player.username = message.payload;
-    player.loggedIn = true;
+    PlayerSession *oldPlayer = findDisconnectedPlayer(message.payload);
 
-    std::cout
-        << "LOGIN: "
-        << player.username
-        << std::endl;
+    if (oldPlayer)
+    {
+        oldPlayer->hdl = hdl;
+        oldPlayer->disconnected = false;
+
+        sendLobbyStatus(hdl, "Reconnected");
+        sendLobbyStatus(hdl, "GameFound");
+        sendPlayerInfo(hdl, oldPlayer->color);
+        sendSnapshot(hdl);
+
+        return;
+    }
+
+    if (!userManager.login(player, message.payload))
+    {
+        sendLobbyStatus(hdl, "LoginFailed");
+        return;
+    }
 }
 
 void WebSocketServer::handlePlay(websocketpp::connection_hdl hdl)
@@ -143,9 +185,7 @@ void WebSocketServer::handlePlay(websocketpp::connection_hdl hdl)
     if (player.gameId != -1)
         return;
 
-    sendLobbyStatus(
-        hdl,
-        "Searching");
+    sendLobbyStatus(hdl, "Searching");
 
     matchmakingManager.addPlayer(&player);
 }
@@ -255,11 +295,7 @@ void WebSocketServer::sendPlayerInfo(websocketpp::connection_hdl hdl, Color colo
 
     websocketpp::lib::error_code ec;
 
-    server.send(
-        hdl,
-        json,
-        websocketpp::frame::opcode::text,
-        ec);
+    server.send(hdl, json, websocketpp::frame::opcode::text, ec);
 
     std::cout << "AFTER SEND" << std::endl;
 
@@ -341,4 +377,15 @@ void WebSocketServer::handleRoom(websocketpp::connection_hdl hdl, const Network:
     PlayerSession &player = getPlayer(hdl);
 
     roomManager.joinRoom(message.payload, &player, matchmakingManager);
+}
+
+PlayerSession *WebSocketServer::findDisconnectedPlayer(const std::string &username)
+{
+    for (auto &player : players)
+    {
+        if (player.username == username && player.disconnected)
+            return &player;
+    }
+
+    return nullptr;
 }

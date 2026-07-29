@@ -3,11 +3,13 @@
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
 
-#include "../src/network/Serializer.hpp"
-#include "GameManager.hpp"
-#include "PlayerSession.hpp"
-#include "RoomManager.hpp"
-#include "MatchmakingManager.hpp"
+#include "../../src/network/Serializer.hpp"
+#include "../game/GameManager.hpp"
+#include "../PlayerSession.hpp"
+#include "../room/RoomManager.hpp"
+#include "../matchmaking/MatchmakingManager.hpp"
+#include "../user/UserManager.hpp"
+#include "../database/Database.hpp"
 
 #include <list>
 #include <vector>
@@ -16,8 +18,7 @@
 class WebSocketServer
 {
 public:
-    WebSocketServer(int port, GameManager &gameManager);
-
+    WebSocketServer(int port, GameManager &gameManager, Database &database);
     void start();
 
     void sendAllSnapshots();
@@ -42,10 +43,11 @@ private:
     void sendSnapshot(websocketpp::connection_hdl hdl);
     void sendSnapshot(websocketpp::connection_hdl hdl, const GameSnapshot &snapshot);
     void sendLobbyStatus(websocketpp::connection_hdl hdl, const std::string &status);
-
-private:
     void handleRoom(websocketpp::connection_hdl hdl, const Network::Message &message);
 
+    PlayerSession *findDisconnectedPlayer(const std::string &username);
+
+private:
     std::list<PlayerSession> players;
 
     Server server;
@@ -56,5 +58,7 @@ private:
 
     GameManager &gameManager;
     RoomManager roomManager;
+    Database &database;
+    UserManager userManager;
     MatchmakingManager matchmakingManager;
 };

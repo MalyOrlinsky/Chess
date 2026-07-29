@@ -19,4 +19,7 @@ struct PlayerSession
 
     bool searchingGame = false;
     std::chrono::steady_clock::time_point searchStartTime;
+
+    bool disconnected = false;
+    std::chrono::steady_clock::time_point disconnectTime;
 };

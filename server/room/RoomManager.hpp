@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Room.hpp"
-#include "MatchmakingManager.hpp"
+#include "../matchmaking/MatchmakingManager.hpp"
 
 #include <string>
 #include <vector>
@@ -18,7 +18,6 @@ public:
     bool hasEnoughPlayers(const Room& room) const;
 
 private:
-    void handleRoomState(Room& room, MatchmakingManager& matchmakingManager);
 
     std::vector<Room> rooms;
 };

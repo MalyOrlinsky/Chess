@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: kungfu-server
+
+    ports:
+      - "8080:8080"
+
+    depends_on:
+      - postgres
+
+
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+
+    container_name: kungfu-client
+
+    depends_on:
+      - server
+
+
+  postgres:
+    image: postgres:17
+
+    container_name: kungfu-postgres
+
+    environment:
+      POSTGRES_DB: kungfu_chess
+      POSTGRES_USER: chess
+      POSTGRES_PASSWORD: chess
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+
+volumes:
+  postgres_data:

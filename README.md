@@ -1,11 +1,76 @@
 # Kung-Fu Chess
 
-מנוע שחמט בזמן אמת ב־C++17 עם לקוח ושרת מבוסס WebSocket.
+מנוע שחמט בזמן אמת ב־C++17 עם לקוח ושרת מבוססי WebSocket.
 
-הפרויקט מחולק לשתי תוכניות עיקריות:
+הפרויקט בונה שני targets עיקריים:
 
-* **Client** – מטפל בקלט משתמש, הצגה ותקשורת WebSocket.
-* **Server** – מנהל מצב המשחק, חישובי חוקיות, עדכון תנועות ולולאת משחק בזמן אמת.
+* `KungFuChessClient` – לקוח הקולט קלט משתמש, מציג את המשחק ומשתמש ב־WebSocket לתקשורת.
+* `KungFuChessServer` – שרת שמנהל מצב משחק, חוקיות מהלכים, לולאת משחק בזמן אמת, matchmaking וחדרים.
+
+---
+
+# מה חדש בדוקומנטציה
+
+* הוספו הוראות בנייה והרצה.
+* הוסברו התפקידים של `client/`, `server/`, `src/` ו־`external/`.
+* הובהר כי קיימים `AI.MD` ו־`Server_Design.MD` לתיעוד מבני ועיצובי.
+
+---
+
+# דרישות
+
+* CMake 3.16 או חדש יותר
+* קומפיילר תומך C++17
+* OpenCV 4.5.1
+* Windows או Linux
+
+---
+
+# בנייה
+
+1. פתח מסוף ב-root של הפרויקט:
+
+   ```bash
+   cd Chess
+   mkdir build
+   cd build
+   cmake ..
+   ```
+
+2. בנייה:
+
+   Windows (Debug/Release):
+   ```bash
+   cmake --build . --config Release
+   ```
+
+   Linux:
+   ```bash
+   cmake --build .
+   ```
+
+3. אחרי בנייה תיווצרנה ההרצות הבאות:
+
+   * `KungFuChessClient`
+   * `KungFuChessServer`
+
+---
+
+# הרצה
+
+1. הפעל את השרת:
+
+   ```bash
+   ./KungFuChessServer
+   ```
+
+2. הפעל את הלקוח:
+
+   ```bash
+   ./KungFuChessClient
+   ```
+
+3. בצע חיבור לשרת דרך הלקוח כדי להתחיל משחק.
 
 ---
 
@@ -16,6 +81,7 @@ Chess/
 │
 ├── AI.MD
 ├── CMakeLists.txt
+├── Dockerfile
 ├── README.md
 ├── Server_Design.MD
 ├── board.txt
@@ -32,6 +98,11 @@ Chess/
 │   ├── GameManager.cpp
 │   ├── GameManager.hpp
 │   ├── GameManager.tpp
+│   ├── MatchmakingManager.cpp
+│   ├── MatchmakingManager.hpp
+│   ├── RoomManager.cpp
+│   ├── RoomManager.hpp
+│   ├── Room.hpp
 │   ├── PlayerSession.hpp
 │   ├── WebSocketServer.cpp
 │   └── WebSocketServer.hpp
@@ -68,143 +139,98 @@ Chess/
 
 ---
 
-# אדריכלות
+# ארכיטקטורה
 
 ```
 Client
  |
  | WebSocket
  |
-Server
+WebSocketServer
  |
-GameLoop
- |
-GameEngine
- |
-+-------------------+
-| RuleEngine        |
-| RealTimeArbiter   |
-+-------------------+
- |
-Board / Piece / State
+ +----------------------+      +---------------------+
+ |                      |      |                     |
+MatchmakingManager   RoomManager  PlayerSession / Room
+ |                      |      |                     |
+ +----------+-----------+      +---------------------+
+            |
+       GameManager
+            |
+         GameLoop
+            |
+        GameEngine
+            |
++----------------------+ 
+| RuleEngine           |
+| RealTimeArbiter      |
++----------------------+
+            |
+      Board / Piece
 ```
 
 ---
 
 # מודולים ושכבות
 
-## Model
+## Client
 
-מכיל את מודל המשחק הבסיסי:
-
-* `Board`
-* `Piece`
-* `PieceFactory`
-
-המודל אינו תלוי בממשק משתמש או ברכיבי רינדור.
+* `client/main.cpp` – נקודת כניסה של הלקוח.
+* `client/NetworkClient.*` – חיבור WebSocket, שליחת הודעות וקבלה של סנאפשוטים, מידע שחקן וסטטוס לובי.
+* `src/renderer/` – רינדור מצב המשחק.
+* `opencv2/src/img.cpp` – wrapper לרינדור OpenCV.
 
 ---
 
-## Movement
+## Server
 
-מכיל את חוקי התנועה לכל כלי:
-
-* `PawnRule`
-* `RookRule`
-* `BishopRule`
-* `KnightRule`
-* `QueenRule`
-* `KingRule`
-
-שכבה זו מיישמת את `Strategy Pattern` עבור חוקי התנועה.
+* `server/main.cpp` – נקודת כניסה של השרת.
+* `server/WebSocketServer.*` – קבלת הודעות מלקוחות ושליחת עדכונים.
+* `server/MatchmakingManager.*` – התאמת שחקנים ל־Play.
+* `server/RoomManager.*` – יצירת חדרים פרטיים וניהול צופים.
+* `server/GameManager.*` – ניהול המשחקים הפעילים.
+* `server/GameLoop.*` – לולאת משחק והתקדמות טווח זמן.
+* `server/Game.*` – מודל משחק בודד.
+* `server/PlayerSession.hpp` – נתוני משתמש מחובר.
 
 ---
 
-## Rule Engine
+## src
 
-מבצע בדיקות תקינות לתנועה:
-
-* חוקיות מהלך
-* גבולות לוח
-* מסלול פתוח
-* תקינות מקור ויעד
-
----
-
-## Arbiter
-
-מנהל לוגיקה של תנועות בזמן אמת:
-
-* `Motion`
-* `MotionUpdater`
-* `MotionAdvancer`
-* `CollisionResolver`
-* `RealTimeArbiter`
+* `src/model/` – מודל משחק בסיסי: לוח, כלי ומשחק.
+* `src/movement/` – חוקי תנועה לכל כלי.
+* `src/rule_engine/` – בדיקת תקינות מהלך.
+* `src/arbiter/` – לוגיקה בזמן אמת, ניהול תנועה וקונפליקטים.
+* `src/game_engine/` – תיאום בין כל רכיבי הליבה.
+* `src/network/` – פרוטוקול הודעות וסיריאליזציה.
+* `src/commands/` – פקודות משחק.
+* `src/controllerClick/` – עיבוד קלט לחיצות.
+* `src/audio/` – ניהול סאונד.
+* `src/config/` – קבצי קונפיגורציה משותפים.
+* `src/text_io/` – קלט/פלט טקסטואלי.
 
 ---
 
-## Game Engine
+## external
 
-שכבת תיאום בין רכיבי המשחק:
-
-* ניהול מצב המשחק
-* יצירת snapshot
-* חיבור בין מודל, תנועה וחוקיות
+* `external/websocketpp` – ספריית WebSocket++.
+* `external/asio` – ASIO ללא Boost.
+* `external/nlohmann/json` – JSON serialization.
 
 ---
 
-## Network
+## נכסים
 
-אחראי על תקשורת בין לקוח לשרת:
-
-* `Protocol`
-* `Message`
-* `Serializer`
-* `WebSocketServer`
-* `NetworkClient`
+* `assets/image/` – תמונות כלי.
+* `assets/sounds/` – אפקטים קוליים.
 
 ---
 
-## Client UI
+# המלצות
 
-* `renderer/` – רינדור תמונה ומצב המשחק.
-* `controllerClick/` – מיפוי לחיצות וקלט משתמש.
-* `audio/` – ניהול אפקטי סאונד.
+* קראו גם את `Server_Design.MD` עבור זרימת המשחק והחלטות עיצוביות בצד השרת.
+* השתמשו ב־`AI.MD` כנקודת התחלה להבנה מהירה של המבנה.
+* בחרו `Release` לסביבת פרודקשן או `Debug` לפיתוח.
 
----
-
-## Configuration
-
-* `src/config/` – קבצי קונפיגורציה משותפים ללקוח ולשרת.
-
----
-
-# Design Patterns
-
-## Strategy Pattern
-
-```
-MoveRule
- |
- +-- PawnRule
- +-- RookRule
- +-- BishopRule
- +-- KnightRule
- +-- QueenRule
- +-- KingRule
-```
-
----
-
-## Factory Pattern
-
-```
-PieceFactory
- |
- +-- Piece objects
-```
-
----
 
 ## Builder Pattern
 
@@ -269,18 +295,21 @@ build/Release/KungFuChessServer.exe
 
 # אחריות מחלקות מרכזיות
 
-| מחלקה             | אחריות                                |
-| ----------------- | ------------------------------------- |
-| `Board`           | ניהול מצב הלוח                         |
-| `Piece`           | מודל כלי                               |
-| `PieceFactory`    | יצירת כלים                             |
-| `RuleEngine`      | בדיקת חוקיות ומשחק חוקי                |
-| `RealTimeArbiter` | ניהול תנועות וקונפליקטים בזמן אמת     |
-| `GameManager`     | ניהול מצבי משחק וסשנים בשרת            |
-| `Serializer`      | המרת הודעות לנתונים ובחזרה             |
-| `NetworkClient`   | תקשורת לקוח עם השרת                   |
-| `WebSocketServer` | תקשורת שרת עם לקוחות WebSocket         |
-| `Renderer`        | הצגת מצב המשחק והאנימציה              |
+| מחלקה              | אחריות                                |
+| ------------------- | ------------------------------------- |
+| `Board`             | מצב הלוח                               |
+| `Piece`             | מודל כלי                               |
+| `PieceFactory`      | יצירת כלים                             |
+| `RuleEngine`        | בדיקת חוקיות                           |
+| `RealTimeArbiter`   | ניהול תנועות וקונפליקטים בזמן אמת     |
+| `Game`              | משחק בודד                              |
+| `GameManager`       | יצירה וניהול של משחקים               |
+| `MatchmakingManager`| התאמת שחקנים ויצירת משחק             |
+| `RoomManager`       | ניהול חדרים                           |
+| `WebSocketServer`   | תקשורת מול הלקוחות                   |
+| `Serializer`        | המרת הודעות                           |
+| `NetworkClient`     | תקשורת הלקוח                         |
+| `Renderer`          | הצגת המשחק                           |
 
 ---
 
