@@ -15,7 +15,7 @@ int main()
 
     database.initialize();
 
-    GameManager gameManager;
+    GameManager gameManager(database);
 
     int gameId = gameManager.createGame();
     gameManager.loadBoard(gameId, "board.txt");

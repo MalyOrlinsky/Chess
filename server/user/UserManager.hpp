@@ -5,6 +5,7 @@
 #include "User.hpp"
 
 #include <string>
+#include <iostream>
 
 class UserManager
 {

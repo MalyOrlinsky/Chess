@@ -90,22 +90,14 @@ Chess/
 │   ├── NetworkClient.cpp
 │   └── NetworkClient.hpp
 ├── server/
+│   ├── database/
+│   ├── game/
+│   ├── matchmaking/
+│   ├── network/
+│   ├── room/
+│   ├── user/
 │   ├── main.cpp
-│   ├── GameLoop.cpp
-│   ├── GameLoop.hpp
-│   ├── Game.cpp
-│   ├── Game.hpp
-│   ├── GameManager.cpp
-│   ├── GameManager.hpp
-│   ├── GameManager.tpp
-│   ├── MatchmakingManager.cpp
-│   ├── MatchmakingManager.hpp
-│   ├── RoomManager.cpp
-│   ├── RoomManager.hpp
-│   ├── Room.hpp
 │   ├── PlayerSession.hpp
-│   ├── WebSocketServer.cpp
-│   └── WebSocketServer.hpp
 ├── src/
 │   ├── audio/
 │   ├── commands/
@@ -184,12 +176,12 @@ MatchmakingManager   RoomManager  PlayerSession / Room
 ## Server
 
 * `server/main.cpp` – נקודת כניסה של השרת.
-* `server/WebSocketServer.*` – קבלת הודעות מלקוחות ושליחת עדכונים.
-* `server/MatchmakingManager.*` – התאמת שחקנים ל־Play.
-* `server/RoomManager.*` – יצירת חדרים פרטיים וניהול צופים.
-* `server/GameManager.*` – ניהול המשחקים הפעילים.
-* `server/GameLoop.*` – לולאת משחק והתקדמות טווח זמן.
-* `server/Game.*` – מודל משחק בודד.
+* `server/database/` – חיבור למסד נתונים והפעלת DB.
+* `server/game/` – לוגיקת משחק, ניהול משחקים ולולאת המשחק.
+* `server/matchmaking/` – התאמת שחקנים ל־Play.
+* `server/network/` – WebSocket ותקשורת רשת.
+* `server/room/` – יצירת חדרים פרטיים וניהול צופים.
+* `server/user/` – ניהול משתמשים וחיבורי Session.
 * `server/PlayerSession.hpp` – נתוני משתמש מחובר.
 
 ---

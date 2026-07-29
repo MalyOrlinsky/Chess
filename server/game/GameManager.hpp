@@ -1,6 +1,9 @@
 #pragma once
 
 #include "Game.hpp"
+#include "../database/Database.hpp"
+#include "../rating/Elo.hpp"
+
 #include <map>
 #include <memory>
 #include <stdexcept>
@@ -10,7 +13,7 @@
 class GameManager
 {
 public:
-    GameManager();
+    GameManager(Database &database);
 
     int createGame();
 
@@ -42,6 +45,8 @@ private:
     std::map<int, std::unique_ptr<Game>> games;
 
     int nextGameId = 0;
+
+    Database &database;
 };
 
 #include "GameManager.tpp"

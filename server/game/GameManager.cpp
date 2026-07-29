@@ -1,6 +1,7 @@
 #include "GameManager.hpp"
 
-GameManager::GameManager()
+GameManager::GameManager(Database &database)
+    : database(database)
 {
 }
 
@@ -31,9 +32,9 @@ GameSnapshot GameManager::snapshot(int gameId) const
 {
     std::lock_guard<std::mutex> lock(mutex);
 
-    const Game* game = findGame(gameId);
+    const Game *game = findGame(gameId);
 
-    if(game == nullptr)
+    if (game == nullptr)
         return {};
 
     return game->snapshot();
@@ -59,6 +60,35 @@ void GameManager::update(int deltaMs)
     {
         game->checkDisconnect();
         game->update(deltaMs);
+
+        if (game->isFinished() && !game->isRatingUpdated())
+        {
+            GameResult result = game->getResult();
+
+            PlayerSession *white = game->getWhitePlayer();
+            PlayerSession *black = game->getBlackPlayer();
+
+            if (white && black)
+            {
+                if (result == GameResult::WhiteWin)
+                {
+                    white->rating = Elo::calculateWinnerRating(white->rating, black->rating);
+                    black->rating = Elo::calculateLoserRating(white->rating, black->rating);
+
+                    database.updateUserRating(white->username, white->rating);
+                    database.updateUserRating(black->username, black->rating);
+                }
+                else if (result == GameResult::BlackWin)
+                {
+                    black->rating = Elo::calculateWinnerRating(black->rating, white->rating);
+                    white->rating = Elo::calculateLoserRating(black->rating, white->rating);
+
+                    database.updateUserRating(black->username, black->rating);
+                    database.updateUserRating(white->username, white->rating);
+                }
+            }
+            game->markRatingUpdated();
+        }
     }
 }
 

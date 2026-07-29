@@ -7,6 +7,13 @@ void MatchmakingManager::addPlayer(PlayerSession *player)
 {
     queue.push_back(player);
 
+    std::cout
+    << "ADD PLAYER "
+    << player->username
+    << " RATING="
+    << player->rating
+    << std::endl;
+
     player->searchingGame = true;
 
     tryMatch();
@@ -17,12 +24,48 @@ void MatchmakingManager::tryMatch()
     if (queue.size() < 2)
         return;
 
-    PlayerSession *player1 = queue[0];
-    PlayerSession *player2 = queue[1];
+    int bestIndex = -1;
+    int bestDifference = INT_MAX;
 
-    queue.erase(queue.begin(), queue.begin() + 2);
+    PlayerSession *newestPlayer = queue.back();
 
-    createMatch(*player1, *player2);
+    std::cout
+    << "SEARCH MATCH FOR "
+    << newestPlayer->username
+    << " RATING="
+    << newestPlayer->rating
+    << std::endl;
+
+    for (int i = 0; i < static_cast<int>(queue.size()) - 1; i++)
+    {
+        PlayerSession *candidate = queue[i];
+        int difference = abs(newestPlayer->rating - candidate->rating);
+
+        std::cout
+    << "CHECK "
+    << candidate->username
+    << " RATING="
+    << candidate->rating
+    << " DIFF="
+    << difference
+    << std::endl;
+
+        if (difference < bestDifference)
+        {
+            bestDifference = difference;
+            bestIndex = i;
+        }
+    }
+
+    if (bestIndex == -1)
+        return;
+
+    PlayerSession *opponent = queue[bestIndex];
+
+    queue.erase(queue.begin() + bestIndex);
+    queue.pop_back();
+
+    createMatch(*newestPlayer, *opponent);
 }
 
 void MatchmakingManager::createMatch(PlayerSession &white, PlayerSession &black)

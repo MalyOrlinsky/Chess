@@ -14,5 +14,12 @@ bool UserManager::login(PlayerSession &player, const std::string &username)
     player.rating = database.getUserRating(username);
     player.loggedIn = true;
 
+    std::cout
+    << "LOGIN USER="
+    << player.username
+    << " RATING="
+    << player.rating
+    << std::endl;
+
     return true;
 }

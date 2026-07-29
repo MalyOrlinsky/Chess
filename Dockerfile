@@ -8,11 +8,7 @@ RUN apt update && apt install -y \
     libpqxx-dev \
     pkg-config \
     && rm -rf /var/lib/apt/lists/*
-    
+
 WORKDIR /app
-
-COPY . .
-
-RUN cmake -S . -B build && cmake --build build
 
 CMD ["bash"]

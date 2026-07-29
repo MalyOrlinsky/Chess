@@ -42,6 +42,12 @@ public:
 
     GameResult getResult() const;
 
+    PlayerSession* getWhitePlayer();
+    PlayerSession* getBlackPlayer();
+
+    bool isRatingUpdated() const;
+    void markRatingUpdated();
+
 private:
     GameEngine engine;
     CommandExecutor executor;
@@ -51,6 +57,7 @@ private:
 
     GameResult result = GameResult::None;
     GameStatus status = GameStatus::Running;
+    bool ratingUpdated = false;
 
     std::chrono::steady_clock::time_point disconnectStart;
     int disconnectedPlayerId = -1;

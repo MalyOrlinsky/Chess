@@ -6,6 +6,8 @@
 
 #include <vector>
 #include <functional>
+#include <climits>
+#include <cstdlib>
 
 class MatchmakingManager
 {

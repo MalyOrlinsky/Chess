@@ -103,3 +103,23 @@ GameResult Game::getResult() const
 {
     return result;
 }
+
+PlayerSession* Game::getWhitePlayer()
+{
+    return whitePlayer;
+}
+
+PlayerSession* Game::getBlackPlayer()
+{
+    return blackPlayer;
+}
+
+bool Game::isRatingUpdated() const
+{
+    return ratingUpdated;
+}
+
+void Game::markRatingUpdated()
+{
+    ratingUpdated = true;
+}

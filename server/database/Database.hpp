@@ -24,6 +24,7 @@ public:
     bool userExists(const std::string &username);
     void createUser(const std::string &username);
     int getUserRating(const std::string &username);
+    void updateUserRating(const std::string& username, int rating);
 
 private:
     std::unique_ptr<pqxx::connection> connection;
