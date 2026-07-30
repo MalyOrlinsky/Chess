@@ -1,48 +1,24 @@
-version: "3.9"
-
 services:
-
-  server:
-    build:
-      context: .
-      dockerfile: Dockerfile
-
-    container_name: kungfu-server
-
-    ports:
-      - "8080:8080"
-
-    depends_on:
-      - postgres
-
-
-  client:
-    build:
-      context: .
-      dockerfile: Dockerfile.client
-
-    container_name: kungfu-client
-
-    depends_on:
-      - server
-
-
-  postgres:
-    image: postgres:17
-
-    container_name: kungfu-postgres
-
+  kungfu-postgres:
+    image: postgres:16
     environment:
       POSTGRES_DB: kungfu_chess
       POSTGRES_USER: chess
       POSTGRES_PASSWORD: chess
-
-    ports:
-      - "5432:5432"
-
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chess -d kungfu_chess"]
+      interval: 5s
+      retries: 5
 
+  chess-server:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      kungfu-postgres:
+        condition: service_healthy
 
 volumes:
-  postgres_data:
+  pgdata:

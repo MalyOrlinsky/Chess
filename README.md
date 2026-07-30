@@ -58,19 +58,28 @@
 
 # הרצה
 
-1. הפעל את השרת:
+## מקומית
+
+1. הפעל שרת + DB עם Docker:
 
    ```bash
-   ./KungFuChessServer
+   docker compose up
    ```
 
-2. הפעל את הלקוח:
+2. בנה והרץ את הלקוח:
 
    ```bash
-   ./KungFuChessClient
+   cmake -S . -B build -DOpenCV_DIR=C:/opencv/build
+   cmake --build build --config Release
+   build\Release\KungFuChessClient.exe
    ```
 
-3. בצע חיבור לשרת דרך הלקוח כדי להתחיל משחק.
+## ענן (AWS EC2)
+
+השרת רץ על EC2 בכתובת `13.60.152.181:8080`.
+הקליינט מחובר אוטומטית לשרת זה.
+
+כל הקליינטים מתחברים לאותו שרת משותף.
 
 ---
 
@@ -262,9 +271,15 @@ Renderer
 
 # Build
 
+Client (Windows):
 ```bash
-cmake -S . -B build
+cmake -S . -B build -DOpenCV_DIR=C:/opencv/build
 cmake --build build --config Release
+```
+
+Server (Docker):
+```bash
+docker compose up
 ```
 
 ---

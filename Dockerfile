@@ -10,5 +10,11 @@ RUN apt update && apt install -y \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+COPY . .
 
-CMD ["bash"]
+RUN cmake -B build -DCMAKE_BUILD_TYPE=Release && \
+    cmake --build build --target KungFuChessServer
+
+EXPOSE 8080
+
+CMD ["./build/KungFuChessServer"]

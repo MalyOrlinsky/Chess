@@ -13,7 +13,7 @@ int main()
 
         NetworkClient client;
 
-        client.connect("chess-server", 8080);
+        client.connect("13.60.152.181", 8080);
 
         Lobby lobby(client);
 
