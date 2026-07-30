@@ -47,6 +47,9 @@ opencv2
 !assets/
 !תמונות/
 
+# Client release
+client_release/
+
 # Misc
 *.log
 Thumbs.db
