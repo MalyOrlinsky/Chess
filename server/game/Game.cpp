@@ -16,6 +16,8 @@ void Game::executeCommand(
 GameSnapshot Game::snapshot() const
 {
     GameSnapshot snapshot = engine.snapshot();
+    snapshot.playerBlack = blackPlayer->username;
+    snapshot.playerWhite = whitePlayer->username;
 
     if (status == GameStatus::Finished)
     {
