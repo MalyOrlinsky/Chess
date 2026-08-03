@@ -53,7 +53,7 @@ void ImgRenderer::run()
 
         frame.show_in(WINDOW_NAME);
 
-        if (Img::wait_key(1) == 27)
+        if ((Img::wait_key(1) & 0xFF) == 27)
             break;
     }
 

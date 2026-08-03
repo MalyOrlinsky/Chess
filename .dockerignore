@@ -1,3 +1,8 @@
 build
 .git
 .vscode
+vcpkg
+client_release
+tests
+assets
+opencv2/OpenCV_451
